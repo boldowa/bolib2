@@ -1,0 +1,34 @@
+"-------------------
+" Set path
+"-------------------
+"let &path.=","."/usr/i686-w64-mingw32/include"
+"let &path ="/usr/i686-w64-mingw32/include"
+
+let &path.=",".getcwd()."/include"
+let &path.=",".getcwd()."/build"
+let &path.=",".getcwd()."/ext/cpputest/include"
+
+"let includes = split(glob("include/*"), "\n")
+"for p in includes
+"	let &path.=",".getcwd()."/".p
+"endfor
+
+"---------------------------------------
+" ale config
+"---------------------------------------
+" --- C
+let g:ale_linters = {'c': ['gcc'], 'cpp': ['gcc']}
+let g:ale_c_gcc_options  = '-ansi '
+let g:ale_c_gcc_options .= '-Wall -Wno-format -Wconversion '
+let g:ale_c_gcc_options .= '-I./include '
+let g:ale_c_gcc_options .= '-I./build '
+let g:ale_c_gcc_options .= '-I./ext/cpputest/include'
+
+"--- mingw32 option
+"let g:ale_c_gcc_executable  = 'i686-w64-mingw32-gcc'
+"let g:ale_c_gcc_options .= '-DWIN32 -DWindows '
+"let g:ale_c_gcc_options .= '-DGUI '
+
+" --- CPP
+let g:ale_cpp_gcc_options  = g:ale_c_gcc_options
+

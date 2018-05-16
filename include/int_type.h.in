@@ -1,0 +1,68 @@
+/**
+ * @file int_type.h
+ */
+#ifndef INT_TYPE_H
+#define INT_TYPE_H
+
+#cmakedefine HAVE_CSTDINT 1
+#cmakedefine HAVE_STDBOOL_H 1
+#cmakedefine HAVE_STDINT_H 1
+#cmakedefine HAVE_INTTYPES_H 1
+#cmakedefine HAVE_SYS_TYPES_H 1
+
+#if defined(HAVE_STDBOOL_H)
+#  include <stdbool.h>
+#else
+#  ifndef __cplusplus
+   /*--- C ---*/
+#    ifdef _Bool
+      typedef _Bool bool;
+#    else
+      typedef char bool;
+#    endif
+#    ifndef false
+#      define false 0
+#    endif
+#    ifndef true
+#      define true !false
+#    endif
+#  endif
+#endif
+
+#if defined(__cplusplus)
+#  if defined(HAVE_CSTDINT)
+#    include <cstdint>
+#  endif
+#else
+#  if defined(HAVE_STDINT_H)
+#    include <stdint.h>
+#  elif defined(HAVE_INTTYPES_H)
+#    include <inttypes.h>
+#  elif defined(HAVE_SYS_TYPES_H)
+#    include <sys/types.h>
+#  else
+     /* type stdint */
+     typedef unsigned char	uint8_t;
+     typedef unsigned short	uint16_t;
+     typedef unsigned int	uint32_t;
+     typedef unsigned long	uint64_t;
+     typedef char		int8_t;
+     typedef short		int16_t;
+     typedef int		int32_t;
+     typedef long		int64_t;
+#  endif
+#endif
+
+/* define type */
+typedef unsigned int	uint;
+typedef unsigned long	ulong;
+typedef uint8_t		uint8;
+typedef uint16_t	uint16;
+typedef uint32_t	uint32;
+typedef uint64_t	uint64;
+typedef int8_t		int8;
+typedef int16_t		int16;
+typedef int32_t		int32;
+typedef int64_t		int64;
+
+#endif
