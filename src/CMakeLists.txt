@@ -3,7 +3,7 @@
 #-------------------------------------------------
 
 # Compile flags
-set(BOLIB2_FLAGS "-Wall -ansi")
+set(BOLIB2_FLAGS "-Wall -Wno-format -Wconversion -ansi")
 
 # Compile All sources
 file(GLOB_RECURSE PRJCSOURCES

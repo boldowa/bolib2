@@ -18,11 +18,10 @@ let &path.=",".getcwd()."/ext/cpputest/include"
 "---------------------------------------
 " --- C
 let g:ale_linters = {'c': ['gcc'], 'cpp': ['gcc']}
-let g:ale_c_gcc_options  = '-ansi '
-let g:ale_c_gcc_options .= '-Wall -Wno-format -Wconversion '
-let g:ale_c_gcc_options .= '-I./include '
+let g:ale_c_gcc_options  = '-I./include '
 let g:ale_c_gcc_options .= '-I./build '
-let g:ale_c_gcc_options .= '-I./ext/cpputest/include'
+let g:ale_c_gcc_options .= '-I./ext/cpputest/include '
+let g:ale_c_gcc_options .= '-Wall -Wno-format -Wconversion '
 
 "--- mingw32 option
 "let g:ale_c_gcc_executable  = 'i686-w64-mingw32-gcc'
@@ -32,3 +31,4 @@ let g:ale_c_gcc_options .= '-I./ext/cpputest/include'
 " --- CPP
 let g:ale_cpp_gcc_options  = g:ale_c_gcc_options
 
+let g:ale_c_gcc_options .= '-ansi '

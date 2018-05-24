@@ -6,7 +6,7 @@
 #include <string.h>
 #include "data/Str.h"
 
-TEST_GROUP(StrTest)
+TEST_GROUP(Str)
 {
 	const char* ST = "('e' *)< Hello, my son, and my daughter.";
 	const char* ST_REP = "('e' *)< Hello, your son, and your daughter.";
@@ -26,7 +26,7 @@ TEST_GROUP(StrTest)
 	}
 };
 
-TEST(StrTest, Str_copy)
+TEST(Str, Str_copy)
 {
 	char* copy;
 
@@ -41,6 +41,25 @@ TEST(StrTest, Str_copy)
 	POINTERS_EQUAL(NULL, Str_copy(NULL));
 
 	free(copy);
+}
+
+
+/**
+ * Check Str_concat
+ */
+TEST(Str, Str_concat)
+{
+	/* Valid value check */
+	char* x = Str_concat("aaa", "bbb");
+	STRCMP_EQUAL("aaabbb", x);
+
+	/* Invalid value check */
+	char* y = Str_concat(NULL, "bbb");
+	POINTERS_EQUAL(NULL, y);
+	y = Str_concat("aaa", NULL);
+	POINTERS_EQUAL(NULL, y);
+
+	free(x);
 }
 
 

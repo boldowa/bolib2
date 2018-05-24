@@ -3,6 +3,8 @@
 #-------------------------------------------------
 cmake_minimum_required(VERSION 3.10)
 
+include(CheckIncludeFiles)
+include(cmake/macs.cmake)
 
 if(NOT CMAKE_BUILD_TYPE)
 	message(STATUS "No build type selected, default to Debug")
@@ -13,9 +15,17 @@ option(BOLIB2_EXECUTE_TEST "Execute test suite" ON)
 option(BOLIB2_COVERAGE "Check code coverage" ON)
 set(BOLIB2_COVERAGE_EXECUTE FALSE)
 
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+	set(BOLIB2_EXECUTE_TEST OFF)
+endif()
+
 project(bolib2)
-include(CheckIncludeFiles)
-include(cmake/macs.cmake)
+
+# GLOBAL
+if(UNIX)
+	set(CMAKE_C_FLAGS_DEBUG   "-O0 -g3")
+	set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+endif(UNIX)
 
 add_subdirectory(ext)
 add_subdirectory(src)
@@ -53,4 +63,12 @@ if(BOLIB2_EXECUTE_TEST)
 endif(BOLIB2_EXECUTE_TEST)
 
 
+set(CMAKE_BUILD_FLAGS "${CMAKE_C_FLAGS}")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_flags(CMAKE_BUILD_FLAGS ${CMAKE_C_FLAGS_DEBUG})
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+	add_flags(CMAKE_BUILD_FLAGS ${CMAKE_C_FLAGS_RELEASE})
+endif()
+
+message("-- CMake compile flags(${CMAKE_BUILD_TYPE}): ${CMAKE_C_COMPILER} ${CMAKE_BUILD_FLAGS}")
 
