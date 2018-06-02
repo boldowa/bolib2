@@ -28,8 +28,8 @@ configure_file("${PROJECT_SOURCE_DIR}/include/btypes.h.in" "${PROJECT_BINARY_DIR
 add_library(bolib2 ${PRJCSOURCES} ${PRJCPPSOURCES})
 target_include_directories(bolib2 PRIVATE
 	"${PROJECT_BINARY_DIR}"
-	"../include"
-	"../ext/cpputest/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../ext/cpputest/include"
 )
 
 if(NOT MSVC)

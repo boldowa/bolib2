@@ -1,0 +1,30 @@
+language: C
+
+addons:
+  apt:
+    packages:
+      - cmake
+      - cmake-data
+
+matrix:
+  include:
+    - os: linux
+      compiler: i686-w64-mingw32-gcc
+      before_install:
+        - sudo apt-get -qq update
+        - sudo apt-get -qq install -y wine
+        - sudo apt-get -qq install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686
+      script:
+        - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x86.cmake .
+        - make -j2
+
+    - os: linux
+      compiler: gcc
+      before_install:
+        - pip install --user cpp-coveralls
+      script:
+        - cmake .
+        - make -j2
+      after_success:
+        - coveralls -e CMakeFiles
+

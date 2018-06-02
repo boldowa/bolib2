@@ -1,7 +1,7 @@
 #-------------------------------------------------
 # bolib2 CMake
 #-------------------------------------------------
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.6)
 
 include(CheckIncludeFiles)
 include(cmake/macs.cmake)
@@ -44,7 +44,7 @@ if(BOLIB2_EXECUTE_TEST)
 		COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/testdata"
 		COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/testdata" "${CMAKE_BINARY_DIR}/testdata"
 		COMMAND ${CMAKE_COMMAND} -E echo "-- Executes bolib2_test ..."
-		COMMAND test/bolib2_test -c
+		COMMAND $<TARGET_FILE:bolib2_test> -c
 		COMMAND ${CMAKE_COMMAND} -E echo "-- Removing test data..."
 		COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/testdata"
 		)
@@ -54,7 +54,7 @@ if(BOLIB2_EXECUTE_TEST)
 		add_custom_target(coverage ALL
 			COMMAND rm -rf gcov
 			COMMAND mkdir gcov
-			COMMAND find src/CMakeFiles/bolib2.dir/ -type f -name "*.gcno" -print0 | xargs -0 env LANG=C gcov
+			COMMAND find src/CMakeFiles/bolib2.dir/ -type f -name "*.gcda" -print0 | xargs -0 env LANG=C gcov
 			COMMAND mv *.gcov gcov
 			)
 		add_dependencies(coverage check)

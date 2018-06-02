@@ -29,28 +29,24 @@
 #  endif
 #endif
 
-#if defined(__cplusplus)
-#  if defined(HAVE_CSTDINT)
-#    include <cstdint>
-#  endif
+#if defined(__cplusplus) && defined(HAVE_CSTDINT)
+#  include <cstdint>
+#elif defined(HAVE_STDINT_H)
+#  include <stdint.h>
+#elif defined(HAVE_INTTYPES_H)
+#  include <inttypes.h>
+#elif defined(HAVE_SYS_TYPES_H)
+#  include <sys/types.h>
 #else
-#  if defined(HAVE_STDINT_H)
-#    include <stdint.h>
-#  elif defined(HAVE_INTTYPES_H)
-#    include <inttypes.h>
-#  elif defined(HAVE_SYS_TYPES_H)
-#    include <sys/types.h>
-#  else
-     /* type stdint */
-     typedef unsigned char	uint8_t;
-     typedef unsigned short	uint16_t;
-     typedef unsigned int	uint32_t;
-     typedef unsigned long	uint64_t;
-     typedef char		int8_t;
-     typedef short		int16_t;
-     typedef int		int32_t;
-     typedef long		int64_t;
-#  endif
+   /* type stdint */
+   typedef unsigned char	uint8_t;
+   typedef unsigned short	uint16_t;
+   typedef unsigned int		uint32_t;
+   typedef unsigned long	uint64_t;
+   typedef char			int8_t;
+   typedef short		int16_t;
+   typedef int			int32_t;
+   typedef long			int64_t;
 #endif
 
 /* define type */

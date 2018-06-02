@@ -19,8 +19,8 @@ add_executable(bolib2_test ${TESTSOURCES})
 target_link_libraries(bolib2_test bolib2 ${CPPUTEST_LIB})
 target_include_directories(bolib2_test PRIVATE
 	"${PROJECT_BINARY_DIR}"
-	"../include"
-	"../ext/cpputest/include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../include"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../ext/cpputest/include"
 )
 
 if(NOT MSVC)
