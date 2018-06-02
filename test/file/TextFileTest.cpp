@@ -2,6 +2,7 @@
  * @file TextFileTest.cpp
  */
 #include <CppUTest/TestHarness.h>
+#include <stdio.h>
 #include "file/TextFile.h"
 
 #define TestRoot "testdata/file/"
@@ -166,14 +167,14 @@ TEST_GROUP(TextFile2)
 		target = new_TextFile(TestRoot WriteFile);
 		reader = new_TextFile(TestRoot WriteFile);
 
-		std::remove(TestRoot WriteFile);
+		::remove(TestRoot WriteFile);
 	}
 
 	void teardown()
 	{
 		delete_TextFile(&target);
 		delete_TextFile(&reader);
-		std::remove(TestRoot WriteFile);
+		::remove(TestRoot WriteFile);
 	}
 };
 
