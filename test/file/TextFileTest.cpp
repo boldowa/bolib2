@@ -166,14 +166,14 @@ TEST_GROUP(TextFile2)
 		target = new_TextFile(TestRoot WriteFile);
 		reader = new_TextFile(TestRoot WriteFile);
 
-		remove(TestRoot WriteFile);
+		std::remove(TestRoot WriteFile);
 	}
 
 	void teardown()
 	{
 		delete_TextFile(&target);
 		delete_TextFile(&reader);
-		remove(TestRoot WriteFile);
+		std::remove(TestRoot WriteFile);
 	}
 };
 

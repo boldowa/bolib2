@@ -5,7 +5,7 @@
 set(CPPUTEST_LIB CppUTest)
 
 # Compile flags
-set(BOLIB2_TEST_FLAGS "-Wall")
+set(BOLIB2_TEST_FLAGS "-Wall -Wpedantic")
 
 if(EXTENSIONS)
 	list(APPEND CPPUTEST_LIB CppUTestExt)
