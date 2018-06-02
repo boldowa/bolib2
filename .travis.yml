@@ -26,5 +26,5 @@ matrix:
         - cmake .
         - make -j2
       after_success:
-        - coveralls -e CMakeFiles
+        - coveralls -e CMakeFiles -e test
 
