@@ -3,6 +3,7 @@
  */
 #include <CppUTest/TestHarness.h>
 #include <string.h>
+#include "../TestCommon.h"
 #include "file/libfile.h"
 
 TEST_GROUP(libfileTest)
@@ -98,8 +99,8 @@ TEST(libfileTest, makedir)
 {
 	/* directory exists check */
 	CHECK_FALSE(dexists("./testdata/file/mkdir"));
-	CHECK(makedir("./testdata/file/mkdir"));
-	CHECK(dexists("./testdata/file/mkdir"));
+	CHECK(makedir(OutDir "mkdir"));
+	CHECK(dexists(OutDir "mkdir"));
 }
 
 

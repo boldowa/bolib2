@@ -3,6 +3,7 @@
  */
 #include <CppUTest/TestHarness.h>
 #include <stdio.h>
+#include "../TestCommon.h"
 #include "file/TextFile.h"
 
 #define TestRoot "testdata/file/"
@@ -164,8 +165,8 @@ TEST_GROUP(TextFile2)
 
 	void setup()
 	{
-		target = new_TextFile(TestRoot WriteFile);
-		reader = new_TextFile(TestRoot WriteFile);
+		target = new_TextFile(OutDir WriteFile);
+		reader = new_TextFile(OutDir WriteFile);
 
 		::remove(TestRoot WriteFile);
 	}

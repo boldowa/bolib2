@@ -15,8 +15,8 @@ matrix:
 #       - sudo apt-get -qq install -y wine
         - sudo apt-get -qq install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686 g++-mingw-w64-i686
       script:
-        - cd build
-        - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x86.cmake -DBOLIB2_EXECUTE_TEST=OFF ..
+        #- cd build
+        - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x86.cmake -DBOLIB2_EXECUTE_TEST=OFF .
         - make -j2
 
     - os: linux
@@ -24,9 +24,9 @@ matrix:
       before_install:
         - pip install --user cpp-coveralls
       script:
-        - cd build
-        - cmake ..
+        #- cd build
+        - cmake .
         - make -j2
       after_success:
-        - coveralls -e CMakeFiles -e test
+        - coveralls -e CMakeFiles -e test -e CMakeFiles
 
