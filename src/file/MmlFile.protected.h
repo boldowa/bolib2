@@ -10,6 +10,7 @@
  */
 struct _MmlFile_protected {
 	const char* hello;
+	void (*overrider)(MmlFile*);
 };
 
 /**

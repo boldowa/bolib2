@@ -11,6 +11,9 @@ struct _TextFile_protected {
 	/* member */
 	char* lineBuffer;
 	uint line;
+
+	/* override method */
+	void (*overrider)(TextFile*);
 };
 
 /**
@@ -19,5 +22,11 @@ struct _TextFile_protected {
  * if you plan to make the final class.
  */
 void delete_TextFile_members(TextFile*);
+
+
+/**
+ * Overrider
+ */
+void override_TextFile(TextFile* self);
 
 #endif

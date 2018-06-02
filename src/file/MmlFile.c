@@ -19,6 +19,7 @@ struct _MmlFile_private {
 
 /* prototypes TODO : Fix it */
 /*static int some_method(MmlFile);*/
+static void overrider_impl(MmlFile* self);
 
 
 /*--------------- Constructor / Destructor ---------------*/
@@ -57,12 +58,13 @@ MmlFile* new_MmlFile_impl(const char* const path)
 	/*--- set protected member ---*/
 	/* TODO : Fix it */
 	pro->hello = "";
+	pro->overrider = overrider_impl;
 
 	/*--- set public member ---*/
 	/* TODO : Fix it */
 	/* inherit TextFile */
 	self->open = (E_FileOpen(*)(MmlFile*))self->super.open;
-	self->open2 = (E_FileOpen(*)(MmlFile*, const char* const))self->super.open;
+	self->open2 = (E_FileOpen(*)(MmlFile*, const char* const))self->super.open2;
 	self->row_get = (uint(*)(MmlFile*))self->super.row_get;
 	self->getline = (const char*(*)(MmlFile*))self->super.getline;
 	self->printf = (void(*)(MmlFile*, const char*, ...))self->super.printf;
@@ -77,6 +79,7 @@ MmlFile* new_MmlFile_impl(const char* const path)
 	/* init MmlFile object */
 	self->pro = pro;
 	self->pri = pri;
+	self->pro->overrider(self);
 	return self;
 }
 
@@ -114,6 +117,27 @@ void delete_MmlFile_impl(MmlFile** self)
 
 
 /*--------------- internal methods ---------------*/
+
+static void overrider_impl(MmlFile* self)
+{
+	assert(self);
+
+	/* TextFile */
+	self->super.open	= (E_FileOpen(*)(TextFile*))self->open;
+	self->super.open2	= (E_FileOpen(*)(TextFile*, const char* const))self->open2;
+	self->super.row_get	= (uint(*)(TextFile*))self->row_get;
+	self->super.getline	= (const char*(*)(TextFile*))self->getline;
+	self->super.printf	= (void(*)(TextFile*, const char*, ...))self->printf;
+	/* File */
+	self->super.path_get	= (const char*(*)(TextFile*))self->path_get;
+	self->super.dir_get	= (const char*(*)(TextFile*))self->dir_get;
+	self->super.name_get	= (const char*(*)(TextFile*))self->name_get;
+	self->super.ext_get	= (const char*(*)(TextFile*))self->ext_get;
+	self->super.close	= (void(*)(TextFile*))self->close;
+	self->super.size_get	= (long(*)(TextFile*))self->size_get;
+
+	self->super.pro->overrider(&self->super);
+}
 
 /* TODO : implement it */
 

@@ -45,6 +45,8 @@ if(BOLIB2_EXECUTE_TEST)
 		#COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/testdata"
 		COMMAND ${CMAKE_COMMAND} -E echo "   copy_directory \"${PROJECT_SOURCE_DIR}/testdata\" \"${CMAKE_BINARY_DIR}/testdata\""
 		COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/testdata" "${CMAKE_BINARY_DIR}/testdata"
+		COMMAND ${CMAKE_COMMAND} -E echo "   remove_directory \"${CMAKE_BINARY_DIR}/testdata/@out\""
+		COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/testdata/@out"
 		COMMAND ${CMAKE_COMMAND} -E echo "   make_directory \"${CMAKE_BINARY_DIR}/testdata/@out\""
 		COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/testdata/@out"
 		COMMAND ${CMAKE_COMMAND} -E echo "-- Executes bolib2_test ..."
@@ -60,7 +62,7 @@ if(BOLIB2_EXECUTE_TEST)
 		add_custom_target(coverage ALL
 			COMMAND rm -rf gcov
 			COMMAND mkdir gcov
-			COMMAND find src/CMakeFiles/bolib2.dir/ -type f -name "*.gcda" -print0 | xargs -0 env LANG=C gcov
+			COMMAND find src/CMakeFiles/bolib2.dir/ -type f -name "*.gcno" -print0 | xargs -0 env LANG=C gcov
 			COMMAND mv *.gcov gcov
 			)
 		add_dependencies(coverage check)

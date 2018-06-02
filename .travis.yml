@@ -6,6 +6,14 @@ addons:
       - cmake
       - cmake-data
 
+git:
+  depth: 3
+
+cache:
+# - apt
+  - pip
+
+
 matrix:
   include:
     # Linux builds
@@ -18,14 +26,13 @@ matrix:
         - cmake .
         - make -j2
       after_success:
-        - coveralls -e CMakeFiles -e test -e CMakeFiles -e ext
+        - coveralls -e test -e testdata -e cmake -e CMakeFiles -e ext
 
     # Windows x86 builds
     - os: linux
       compiler: i686-w64-mingw32-gcc
       before_install:
         - sudo apt-get -qq update
-#       - sudo apt-get -qq install -y wine
         - sudo apt-get -qq install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686 g++-mingw-w64-i686
       script:
         #- cd build
@@ -37,7 +44,6 @@ matrix:
       compiler: x86_64-w64-mingw32-gcc
       before_install:
         - sudo apt-get -qq update
-#       - sudo apt-get -qq install -y wine
         - sudo apt-get -qq install -y binutils-mingw-w64-x86-64 gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
       script:
         #- cd build

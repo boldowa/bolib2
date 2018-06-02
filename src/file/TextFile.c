@@ -22,6 +22,7 @@ static E_FileOpen open2_impl(TextFile*, const char*);
 static uint row_get_impl(TextFile*);
 static const char* getline_impl(TextFile*);
 static void printf_impl(TextFile*, const char*, ...);
+static void overrider_impl(TextFile* self);
 
 
 /*--------------- Constructor / Destructor ---------------*/
@@ -53,6 +54,7 @@ TextFile* new_TextFile(const char* const path)
 	/*--- set protected member ---*/
 	pro->line = 0;
 	pro->lineBuffer = NULL;
+	pro->overrider = overrider_impl;
 
 	/*--- set public member ---*/
 	self->open = open_impl;
@@ -70,6 +72,7 @@ TextFile* new_TextFile(const char* const path)
 
 	/* init TextFile object */
 	self->pro = pro;
+	self->pro->overrider(self);
 	return self;
 }
 
@@ -107,6 +110,18 @@ void delete_TextFile(TextFile** self)
 
 
 /*--------------- internal methods ---------------*/
+
+static void overrider_impl(TextFile* self)
+{
+	assert(self);
+
+	self->super.path_get	= (const char*(*)(File*))self->path_get;
+	self->super.dir_get	= (const char*(*)(File*))self->dir_get;
+	self->super.name_get	= (const char*(*)(File*))self->name_get;
+	self->super.ext_get	= (const char*(*)(File*))self->ext_get;
+	self->super.close	= (void(*)(File*))self->close;
+	self->super.size_get	= (long(*)(File*))self->size_get;
+}
 
 static uint row_get_impl(TextFile* self)
 {
