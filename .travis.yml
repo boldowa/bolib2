@@ -5,12 +5,12 @@ sudo: false
 cache:
   - apt
   - pip
+  directories:
+   - $HOME/.cache/pip
 
-addons:
-  apt:
-    packages:
-      - cmake
-      - cmake-data
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+
 
 git:
   depth: 3
@@ -21,10 +21,16 @@ matrix:
     # Linux builds
     - os: linux
       compiler: gcc
+      addons:
+        apt:
+          packages:
+            - cmake
+            - cmake-data
       before_install:
         - pip install --user cpp-coveralls
       script:
         #- cd build
+        - df -h
         - cmake .
         - make -j2
       after_success:
@@ -36,10 +42,13 @@ matrix:
       addons:
         apt:
           packages:
+            - cmake
+            - cmake-data
             - binutils-mingw-w64-i686
             - gcc-mingw-w64-i686
             - g++-mingw-w64-i686
       script:
+        - df -h
         - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x86.cmake -DBOLIB2_EXECUTE_TEST=OFF .
         - make -j2
 
@@ -49,10 +58,13 @@ matrix:
       addons:
         apt:
           packages:
+            - cmake
+            - cmake-data
             - binutils-mingw-w64-x86-64
             - gcc-mingw-w64-x86-64
             - g++-mingw-w64-x86-64
       script:
+        - df -h
         - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x64.cmake -DBOLIB2_EXECUTE_TEST=OFF .
         - make -j2
 
