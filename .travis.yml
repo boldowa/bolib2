@@ -1,5 +1,11 @@
 language: C
 
+sudo: false
+
+cache:
+  - apt
+  - pip
+
 addons:
   apt:
     packages:
@@ -8,10 +14,6 @@ addons:
 
 git:
   depth: 3
-
-cache:
-# - apt
-  - pip
 
 
 matrix:
@@ -31,22 +33,26 @@ matrix:
     # Windows x86 builds
     - os: linux
       compiler: i686-w64-mingw32-gcc
-      before_install:
-        - sudo apt-get -qq update
-        - sudo apt-get -qq install -y binutils-mingw-w64-i686 gcc-mingw-w64-i686 g++-mingw-w64-i686
+      addons:
+        apt:
+          packages:
+            - binutils-mingw-w64-i686
+            - gcc-mingw-w64-i686
+            - g++-mingw-w64-i686
       script:
-        #- cd build
         - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x86.cmake -DBOLIB2_EXECUTE_TEST=OFF .
         - make -j2
 
     # Windows x64 builds
     - os: linux
       compiler: x86_64-w64-mingw32-gcc
-      before_install:
-        - sudo apt-get -qq update
-        - sudo apt-get -qq install -y binutils-mingw-w64-x86-64 gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
+      addons:
+        apt:
+          packages:
+            - binutils-mingw-w64-x86-64
+            - gcc-mingw-w64-x86-64
+            - g++-mingw-w64-x86-64
       script:
-        #- cd build
         - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x64.cmake -DBOLIB2_EXECUTE_TEST=OFF .
         - make -j2
 
