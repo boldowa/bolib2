@@ -5,7 +5,7 @@ sudo: false
 cache:
   - apt
   - pip
-  directories:
+  - directories:
    - $HOME/.cache/pip
 
 before_cache:
