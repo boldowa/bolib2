@@ -9,7 +9,9 @@
 
 #include <stdio.h>
 #include <assert.h>
-#if !isWindows
+#if isWindows
+#  include <stdlib.h>
+#else
 #  include <sys/stat.h>
 #endif
 #include "data/Str.h"

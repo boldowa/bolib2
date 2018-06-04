@@ -2,6 +2,7 @@
  * @file RomFileTest.cpp
  */
 #include <CppUTest/TestHarness.h>
+#include <stdio.h>
 #include <memory.h>
 #include "memory/bmem.h"
 #include "../TestCommon.h"
