@@ -3,9 +3,8 @@ language: C
 sudo: false
 
 cache:
-  - apt
-  - pip
-
+#  - apt
+#  - pip
   directories:
     - $HOME/.cache/pip
 
