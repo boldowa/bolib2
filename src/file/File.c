@@ -59,6 +59,10 @@ File* new_File_impl(const char* const path)
 	self->open = open_impl;
 	self->size_get = size_get_impl;
 
+	/*--- set vertual ---*/
+	pro->open_vertual = open_impl;
+	pro->close_vertual = close_impl;
+
 	/* init File object */
 	self->pro = pro;
 	return self;

@@ -10,6 +10,7 @@
 #cmakedefine HAVE_INTTYPES_H 1
 #cmakedefine HAVE_SYS_TYPES_H 1
 
+#ifndef _BOLIB_INT_DEFINED
 #if defined(HAVE_STDBOOL_H)
 #  include <stdbool.h>
 #else
@@ -61,4 +62,5 @@ typedef int16_t		int16;
 typedef int32_t		int32;
 typedef int64_t		int64;
 
+#endif /*_BOLIB_INT_DEFINED*/
 #endif

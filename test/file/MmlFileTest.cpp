@@ -35,6 +35,7 @@ TEST(MmlFile, new)
 	/* Inherited methods */
 	CHECK(NULL!=target->open);
 	CHECK(NULL!=target->open2);
+	CHECK(NULL!=target->close);
 	CHECK(NULL!=target->row_get);
 	CHECK(NULL!=target->getline);
 	CHECK(NULL!=target->printf);
@@ -42,7 +43,6 @@ TEST(MmlFile, new)
 	CHECK(NULL!=target->dir_get);
 	CHECK(NULL!=target->name_get);
 	CHECK(NULL!=target->ext_get);
-	CHECK(NULL!=target->close);
 	CHECK(NULL!=target->size_get);
 
 	/* protected member */

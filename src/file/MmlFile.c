@@ -133,6 +133,7 @@ static void overrider_impl(MmlFile* self)
 	self->super.dir_get	= (const char*(*)(TextFile*))self->dir_get;
 	self->super.name_get	= (const char*(*)(TextFile*))self->name_get;
 	self->super.ext_get	= (const char*(*)(TextFile*))self->ext_get;
+	self->super.open	= (E_FileOpen (*)(TextFile*))self->open;
 	self->super.close	= (void(*)(TextFile*))self->close;
 	self->super.size_get	= (long(*)(TextFile*))self->size_get;
 

@@ -38,6 +38,7 @@ if(BOLIB2_EXECUTE_TEST)
 	message("-- gcov found: ${GCOV}")
 
 	add_subdirectory(test)
+	enable_testing()
 	add_test(NAME bolib2 COMMAND bolib2_test)
 	add_custom_target(check ALL
 		COMMAND ${CMAKE_COMMAND} -E echo "+++++ Test starts... +++++"
@@ -58,6 +59,27 @@ if(BOLIB2_EXECUTE_TEST)
 		)
 	add_dependencies(check bolib2_test)
 	add_dependencies(bolib2_exe check)
+
+	find_program(GDB gdb)
+	if(NOT GDB)
+		message(WARNING "gdb isn't found.")
+	endif(NOT GDB)
+	# debug
+	add_custom_target(debug
+		COMMAND ${CMAKE_COMMAND} -E echo "-- Prepareing test data..."
+		#COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/testdata"
+		COMMAND ${CMAKE_COMMAND} -E echo "   copy_directory \"${PROJECT_SOURCE_DIR}/testdata\" \"${CMAKE_BINARY_DIR}/testdata\""
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/testdata" "${CMAKE_BINARY_DIR}/testdata"
+		COMMAND ${CMAKE_COMMAND} -E echo "   remove_directory \"${CMAKE_BINARY_DIR}/testdata/@out\""
+		COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/testdata/@out"
+		COMMAND ${CMAKE_COMMAND} -E echo "   make_directory \"${CMAKE_BINARY_DIR}/testdata/@out\""
+		COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/testdata/@out"
+		COMMAND ${CMAKE_COMMAND} -E echo "-- Executes gdb..."
+		COMMAND gdb $<TARGET_FILE:bolib2_test>
+		)
+	add_dependencies(debug bolib2_test)
+
+	# coverage
 	if(BOLIB2_COVERAGE_EXECUTE)
 		add_custom_target(coverage ALL
 			COMMAND rm -rf gcov

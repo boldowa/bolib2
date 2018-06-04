@@ -66,8 +66,10 @@
 #  define strncpy_s(dst, len, src, cnt) strncpy(dst, src, cnt)
 #  define strcat_s(s1, len, s2) strcat(s1, s2)
 #  define strncat_s(s1, len, s2, cnt) strncat(s1, s2, cnt)
+#if !defined(__STDC__)
 #  define sprintf_s(buf, len, fmt, ...)  sprintf(buf, fmt, ##__VA_ARGS__)
 #  define _stprintf_s(buf, len, fmt, ...)  sprintf(buf, fmt, ##__VA_ARGS__)
+#endif
 #endif
 
 #endif

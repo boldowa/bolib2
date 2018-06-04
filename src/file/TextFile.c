@@ -119,6 +119,7 @@ static void overrider_impl(TextFile* self)
 	self->super.dir_get	= (const char*(*)(File*))self->dir_get;
 	self->super.name_get	= (const char*(*)(File*))self->name_get;
 	self->super.ext_get	= (const char*(*)(File*))self->ext_get;
+	self->super.open	= (E_FileOpen (*)(File*))self->open;
 	self->super.close	= (void(*)(File*))self->close;
 	self->super.size_get	= (long(*)(File*))self->size_get;
 }
@@ -218,7 +219,7 @@ static E_FileOpen open2_impl(TextFile* self, const char* mode)
 	}
 
 	textp->line = 0;
-	return self->super.open(&self->super);
+	return self->super.pro->open_vertual(&self->super);
 }
 
 static E_FileOpen open_impl(TextFile* self)

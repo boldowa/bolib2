@@ -4,6 +4,7 @@
 #ifndef FILE_PROTECTED_H
 #define FILE_PROTECTED_H
 
+#include <stdio.h>
 #include "file/FilePath.h"
 
 /**
@@ -18,6 +19,10 @@ struct _File_protected {
 	char* mode;
 	/* File size */
 	long size;
+
+	/* vertual function pointer */
+	E_FileOpen (*open_vertual)(File*);
+	void (*close_vertual)(File*);
 };
 
 /**

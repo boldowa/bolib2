@@ -36,7 +36,6 @@ TEST(TextFile, new)
 	CHECK(NULL != target);
 
 	/* method */
-	CHECK(NULL!=target->open);
 	CHECK(NULL!=target->open2);
 	CHECK(NULL!=target->row_get);
 	CHECK(NULL!=target->getline);
@@ -47,6 +46,7 @@ TEST(TextFile, new)
 	CHECK(NULL!=target->dir_get);
 	CHECK(NULL!=target->name_get);
 	CHECK(NULL!=target->ext_get);
+	CHECK(NULL!=target->open);
 	CHECK(NULL!=target->close);
 	CHECK(NULL!=target->size_get);
 
