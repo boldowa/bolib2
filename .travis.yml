@@ -70,3 +70,16 @@ matrix:
         - cmake -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-x64.cmake -DBOLIB2_EXECUTE_TEST=OFF .
         - make -j2
 
+    # Mac OSX builds
+    - os: osx
+      compiler: gcc
+#     addons:
+#       apt:
+#         packages:
+#           - cmake
+#           - cmake-data
+      script:
+        - df -h
+        - cmake .
+        - make -j2
+
