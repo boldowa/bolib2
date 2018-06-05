@@ -80,6 +80,6 @@ matrix:
 #           - cmake-data
       script:
         - df -h
-        - cmake .
+        - cmake . -DBOLIB2_COVERAGE=OFF
         - make -j2
 
