@@ -5,14 +5,6 @@
 #define ROMFILE_PROTECTED_H
 
 /**
- * @brief SA1 information
- */
-typedef struct _SA1AdrInfo {
-	bool		useHiRomMap;
-	uint8		slots[4];
-} SA1AdrInfo;
-
-/**
  * RomFile main instance
  */
 struct _RomFile_protected {
@@ -22,6 +14,7 @@ struct _RomFile_protected {
 	long		size;
 	RomType		type;
 	MapMode		map;
+	CopType		cop;
 	uint16		csum;
 	uint16		hcsum;
 	uint16		hcsumc;

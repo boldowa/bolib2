@@ -41,6 +41,24 @@ typedef enum MapMode{
 
 }MapMode;
 
+typedef enum CopType {
+	CopType_None	= 0,
+	CopType_DSP,
+	CopType_SuperFX,
+	CopType_OBC1,
+	CopType_SA1,
+	CopType_Custom,
+	CopType_Other
+}CopType;
+
+/**
+ * @brief SA1 information
+ */
+typedef struct _SA1AdrInfo {
+	bool		useHiRomMap;
+	uint8		slots[4];
+} SA1AdrInfo;
+
 /**
  * @brief Search data function pointer
  *
@@ -82,6 +100,8 @@ struct _RomFile {
 	void (*DetectRomType)(RomFile*);
 	uint32 (*SearchFreeSpace)(RomFile*, const uint32);
 	bool (*HasHeader)(RomFile*);
+	void (*SetSA1Info)(RomFile*, SA1AdrInfo);
+	SA1AdrInfo (*GetSA1Info)(RomFile*);
 	/* ... */
 	const char* (*path_get)(RomFile*);
 	const char* (*dir_get)(RomFile*);

@@ -50,6 +50,8 @@ static bool ChecksumUpdate_impl(RomFile* self);
 static void DetectRomType_impl(RomFile* self);
 static uint32 SearchFreeSpace_impl(RomFile* self, const uint32 len);
 static bool HasHeader_impl(RomFile* self);
+static void SetSA1Info_impl(RomFile* self, const SA1AdrInfo sa1inf);
+static SA1AdrInfo GetSA1Info_impl(RomFile* self);
 
 /* default handler */
 static uint32 NullSnesAdr(RomFile* self, const uint32 ad);
@@ -92,6 +94,7 @@ RomFile* new_RomFile_impl(const char* const path)
 	pro->csum = 0;
 	pro->map = MapMode_Unknown;
 	pro->type = RomType_Unknown;
+	pro->cop = CopType_None;
 	pro->size = 0;
 	pro->rom = NULL;
 	pro->raw = NULL;
@@ -119,6 +122,8 @@ RomFile* new_RomFile_impl(const char* const path)
 	self->DetectRomType	= DetectRomType_impl;
 	self->SearchFreeSpace	= SearchFreeSpace_impl;
 	self->HasHeader		= HasHeader_impl;
+	self->SetSA1Info	= SetSA1Info_impl;
+	self->GetSA1Info	= GetSA1Info_impl;
 	/* inherit */
 	self->open		= open_impl;	/* override */
 	self->close		= close_impl;	/* override */
@@ -256,6 +261,7 @@ static /*override*/ void close_impl(RomFile* self)
 	self->pro->rom = NULL;
 	self->super.pro->close_vertual(&self->super);
 	self->pro->map = MapMode_Unknown;
+	self->pro->cop = CopType_None;
 
 	self->Snes2PcAdr = NullSnesAdr;
 	self->Pc2SnesAdr = NullSnesAdr;
@@ -555,35 +561,125 @@ static bool HasHeader_impl(RomFile* self)
 }
 
 
+static void SetSA1Info_impl(RomFile* self, const SA1AdrInfo sa1inf)
+{
+	memcpy(&self->pro->sa1adrinf, &sa1inf, sizeof(SA1AdrInfo));
+}
+
+
+static SA1AdrInfo GetSA1Info_impl(RomFile* self)
+{
+	return self->pro->sa1adrinf;
+}
+
+
 /*=== ROM address conversion functions ====================================*/
+
+bool IsValidSnesAddressCommon(RomFile* self, const uint32 sna)
+{
+	uint32 bnk;
+
+	/* 24bits overflow */
+	if(0x1000000 <= sna) return ROMADDRESS_NULL;
+
+	/* RAM specified check */
+	bnk = sna & 0xff0000;
+	switch(bnk)
+	{
+		case 0x7e0000:
+		case 0x7f0000:
+			/* RAM Address, invalid */
+			return false;
+		default:
+			break;
+	}
+
+	if(0x8000 > (sna&0xffff))
+	{
+		/* bnk 00-3f : 80-bf */
+		if(0 == (sna & 0x400000))
+		{
+			/* RAM Address, invalid */
+			return false;
+		}
+
+		if(RomType_LoRom == self->pro->type)
+		{
+			/* return false except SuperFX/SA-1 */
+			if(self->pro->map != MapMode_SA1)
+			{
+				if(CopType_SuperFX != self->pro->cop)
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+bool IsLoRomSRAMAddress(RomFile* self, uint32 sna)
+{
+	/* $70:0000 - $7D:FFFF is LoROM GamePakRAM Address */
+	if(0x700000 <= sna && 0x7dffff >= sna)
+	{
+		return true;
+	}
+
+	return false;
+}
 
 /*===== LoRom =====*/
 static uint32 LoRom_Snes2Pc(RomFile* self, const uint32 sna)
 {
 	uint32 pca;
-	if(0x1000000 <= sna) return ROMADDRESS_NULL;
-	if(0 == (sna & 0x8000)) return ROMADDRESS_NULL;
 
+	if(!IsValidSnesAddressCommon(self,sna)) return ROMADDRESS_NULL;
+	if(IsLoRomSRAMAddress(self,sna)) return ROMADDRESS_NULL;
+
+	/* SuperFX */
+	if(CopType_SuperFX == self->pro->cop)
+	{
+		/* Mirror address mapping */
+		if(0x400000 == (sna & 0xc00000))
+		{
+			pca = sna & 0x3fffff;
+			if(self->pro->size <= pca) return ROMADDRESS_NULL;
+			return pca;
+		}
+		/* CPU ROM, invalid address */
+		if(0 != (sna & 0x800000))
+		{
+			return ROMADDRESS_NULL;
+		}
+	}
+
+	/* LoROM address map */
 	pca = (((sna&0x7f0000)>>1) + (sna&0x7fff));
 	if(self->pro->size <= pca) return ROMADDRESS_NULL;
 	return pca;
 }
 static uint32 LoRom_Pc2Snes(RomFile* self, const uint32 pca)
 {
+	uint32 sna;
 	if(self->pro->size <= pca) return ROMADDRESS_NULL;
 	if(0x400000 <= pca) return ROMADDRESS_NULL;
 
-	return ((((pca&0x7f8000)<<1)|0x800000) + ((pca&0x7fff)|0x8000));
+	sna = (((pca&0x7f8000)<<1) + ((pca&0x7fff)|0x8000));
+	if(CopType_SuperFX == self->pro->cop)
+	{
+		return sna;	/* SuperFX can't use mirror address */
+	}
+	return sna | 0x800000;	/* 3.58MHz mirror */
 }
 
 /*===== SA-1(LoRom) =====*/
 
-/**
- * RPG Hacker: New SA-1 mapping functions, borrowed from Asar, since original
- * functions didn't work correctly. See below for original functions.
- */
 #ifdef ASAR_SA1ADDRMODE
 /**
+ * RPG Hacker: New SA-1 mapping functions, borrowed from Asar.
+ *
  * Note: This is the function for SMW-SA1.
  *       So, it can't use "UseHiRomMapSA1" method.
  */
@@ -619,70 +715,70 @@ static uint32 SA1_Pc2Snes(RomFile* self, const uint32 pca)
 	}
 	return ROMADDRESS_NULL;
 }
-/**
- * RPG Hacker: Original SA-1 mapping functions.
- * Left here for reference.
- */
 
 #else
 
 /**
- * Any rom compatibility function.
- *   TODO: implement the function for switch slot.
+ * New SA-1 Address convert functions.
+ * It supports SuperMMC Slot changes feature.
  */
 static uint32 SA1_Snes2Pc(RomFile* self, const uint32 sna)
 {
 	uint32 pca;
 	int slot;
 	uint8 bnk = (uint8)(sna >> 16);
-	bool useHiRomMap;
+	bool isHiRomMap;
 
+	if(!IsValidSnesAddressCommon(self,sna)) return ROMADDRESS_NULL;
+
+	/* Detects address type */
 	if((0x00 <= bnk) && (0x20 > bnk))
 	{
 		slot = 0;
-		useHiRomMap = false;
+		isHiRomMap = false;
 	}
 	else if((0x20 <= bnk) && (0x40 > bnk))
 	{
 		slot = 1;
-		useHiRomMap = false;
+		isHiRomMap = false;
 	}
 	else if((0x80 <= bnk) && (0xa0 > bnk))
 	{
 		slot = 2;
-		useHiRomMap = false;
+		isHiRomMap = false;
 	}
 	else if((0xa0 <= bnk) && (0xc0 > bnk))
 	{
 		slot = 3;
-		useHiRomMap = false;
+		isHiRomMap = false;
 	}
 	else if((0xc0 <= bnk) && (0xcf >= bnk))
 	{
 		slot = 0;
-		useHiRomMap = true;
+		isHiRomMap = true;
 	}
 	else if((0xd0 <= bnk) && (0xdf >= bnk))
 	{
 		slot = 1;
-		useHiRomMap = true;
+		isHiRomMap = true;
 	}
 	else if((0xe0 <= bnk) && (0xef >= bnk))
 	{
 		slot = 2;
-		useHiRomMap = true;
+		isHiRomMap = true;
 	}
 	else if((0xf0 <= bnk) && (0xff >= bnk))
 	{
 		slot = 3;
-		useHiRomMap = true;
+		isHiRomMap = true;
 	}
 	else
 	{
 		return ROMADDRESS_NULL;
 	}
 
-	if(useHiRomMap)
+	/* Calculate PC address */
+	if(isHiRomMap)
 	{
 		pca = (uint32)((((self->pro->sa1adrinf.slots[slot])+((uint32)bnk&0x0f)) << 16) + ((uint32)sna & 0xffff));
 	}
@@ -694,57 +790,64 @@ static uint32 SA1_Snes2Pc(RomFile* self, const uint32 sna)
 	if(self->pro->size <= pca) return ROMADDRESS_NULL;
 	return pca;
 }
-static uint32 SA1_Pc2Snes(RomFile* self, const uint32 pca)
+static int SA1_GetSlotIndex(RomFile* self, const uint32 pca)
 {
 	int i;
-	uint8 bnk = (uint8)(pca>>16);
-	uint32 add = 0;
-
-	if(self->pro->size <= pca) return ROMADDRESS_NULL;
-	if(0x800000 <= pca) return ROMADDRESS_NULL;
-
-	/* HiRom map */
-	if(self->pro->sa1adrinf.useHiRomMap)
-	{
-		for(i=0; i<4; i++)
-		{
-			if(self->pro->sa1adrinf.slots[i] <= bnk
-					&& self->pro->sa1adrinf.slots[i] + 16 > bnk)
-			{
-				break;
-			}
-		}
-		if(4 <= i) return ROMADDRESS_NULL;
-		return (((((self->pro->sa1adrinf.slots[i] & 0x7f) + ((uint32)bnk & 0x0f)) << 16) + (((uint32)pca&0xffff))) | 0xc00000);
-	}
-
-	/* LoRom map */
+	const uint8 bnk = (uint8)(pca>>16);
 	for(i=0; i<4; i++)
 	{
 		if(self->pro->sa1adrinf.slots[i] <= bnk
-		&& self->pro->sa1adrinf.slots[i] + 16 > bnk)
+				&& self->pro->sa1adrinf.slots[i] + 16 > bnk)
 		{
-			break;
+			return i;
 		}
 	}
-	switch(i) /* switch slot */
+	return -1;
+}
+static uint32 SA1_Pc2Snes_LoRom(RomFile* self, const uint32 pca)
+{
+	int slotInx;
+	uint32 base;
+	uint32 add = 0;
+	static const uint32 slotAdds[4] = {0x000000, 0x200000, 0x800000, 0xa00000};
+
+	/* Get slot & base */
+	slotInx = SA1_GetSlotIndex(self, pca);
+	if(0>slotInx) return ROMADDRESS_NULL;
+
+	add = slotAdds[slotInx];
+	base = pca - ((uint32)self->pro->sa1adrinf.slots[slotInx] << 16);
+
+	/* calculate address */
+	return add + ((base&0x0f8000)<<1) + ((0x7fff&base)|0x8000);
+}
+static uint32 SA1_Pc2Snes_HiRom(RomFile* self, const uint32 pca)
+{
+	int slotInx;
+	uint32 base;
+	uint32 add = 0;
+
+	/* Get slot & base */
+	slotInx = SA1_GetSlotIndex(self, pca);
+	if(0>slotInx) return ROMADDRESS_NULL;
+
+	add = (uint32)(slotInx << 20);
+	base = pca - ((uint32)self->pro->sa1adrinf.slots[slotInx] << 16);
+
+	/* calculate address */
+	return 0xc00000 + add + (base&0x0fffff);
+}
+static uint32 SA1_Pc2Snes(RomFile* self, const uint32 pca)
+{
+	if(self->pro->size <= pca) return ROMADDRESS_NULL;
+	if(0x800000 <= pca) return ROMADDRESS_NULL;
+
+	if(self->pro->sa1adrinf.useHiRomMap)
 	{
-		case 0:
-			add = 0x00;
-			break;
-		case 1:
-			add = 0x20;
-			break;
-		case 2:
-			add = 0x80;
-			break;
-		case 3:
-			add = 0xa0;
-			break;
-		default:
-			return ROMADDRESS_NULL;
+		return SA1_Pc2Snes_HiRom(self,pca);
 	}
-	return (((add + ((uint32)bnk & 0x0f)) << 16) + (((uint32)pca&0x17fff)|0x8000));
+
+	return SA1_Pc2Snes_LoRom(self, pca);
 }
 #endif
 
@@ -753,7 +856,7 @@ static uint32 HiRom_Snes2Pc(RomFile* self, const uint32 sna)
 {
 	uint32 pca;
 
-	if(0x1000000 <= sna) return ROMADDRESS_NULL;
+	if(!IsValidSnesAddressCommon(self,sna)) return ROMADDRESS_NULL;
 
 	pca = sna & 0x3fffff;
 	if(self->pro->size <= pca) return ROMADDRESS_NULL;
@@ -784,8 +887,7 @@ static uint32 ExLoRom_Snes2Pc(RomFile* self, const uint32 sna)
 {
 	uint32 pca;
 
-	if(0x1000000 <= sna) return ROMADDRESS_NULL;
-	if(0 == (sna & 0x8000)) return ROMADDRESS_NULL;
+	if(!IsValidSnesAddressCommon(self,sna)) return ROMADDRESS_NULL;
 
 	if(0 != (0x800000 & sna))
 	{
@@ -803,11 +905,11 @@ static uint32 ExLoRom_Pc2Snes(RomFile* self, const uint32 pca)
 	if(self->pro->size <= pca) return ROMADDRESS_NULL;
 	if(0x7f0000 <= pca) return ROMADDRESS_NULL;
 
-	if(0x400000 <= pca)
+	if(0x400000 > pca)
 	{
-		return ((((pca&0x7f8000)<<1)&0x7fffff) + ((pca&0x7fff)|0x8000));
+		return ((((pca&0x7f8000)<<1)|0x800000) + ((pca&0x7fff)|0x8000));
 	}
-	return ((((pca&0x7f8000)<<1)|0x800000) + ((pca&0x7fff)|0x8000));
+	return ((((pca&0x7f8000)<<1)&0x7fffff) + ((pca&0x7fff)|0x8000));
 }
 
 /*===== ExHiRom =====*/
@@ -815,10 +917,9 @@ static uint32 ExHiRom_Snes2Pc(RomFile* self, const uint32 sna)
 {
 	uint32 pca;
 
-	if(0x1000000 <= sna) return ROMADDRESS_NULL;
-	if(0 == (sna & 0x400000)) return ROMADDRESS_NULL;
+	if(!IsValidSnesAddressCommon(self,sna)) return ROMADDRESS_NULL;
 
-	if(0xc00000 == (0xc00000 & sna))
+	if(0x800000 == (0x800000 & sna))
 	{
 		pca = (sna & 0x3fffff);
 	}
@@ -925,6 +1026,41 @@ static bool RomType_ValidSum(RomFile* self, const uint32 pca)
 	return true;
 }
 
+static void SetCopType(RomFile* self)
+{
+	uint8* p;
+	uint8 cartType;
+	static const CopType CartCopTypes[] = {
+		CopType_DSP,		/* 0x0* */
+		CopType_SuperFX,	/* 0x1* */
+		CopType_OBC1,		/* 0x2* */
+		CopType_SA1,		/* 0x3* */
+		CopType_None,		/* 0x4* */
+		CopType_None,		/* 0x5* */
+		CopType_None,		/* 0x6* */
+		CopType_None,		/* 0x7* */
+		CopType_None,		/* 0x8* */
+		CopType_None,		/* 0x9* */
+		CopType_None,		/* 0xa* */
+		CopType_None,		/* 0xb* */
+		CopType_None,		/* 0xc* */
+		CopType_None,		/* 0xd* */
+		CopType_Other,		/* 0xe* */
+		CopType_Custom		/* 0xf* */
+	};
+
+	assert(self);
+
+	self->pro->cop = CopType_None;
+	p = self->GetSnesPtr(self, 0x00ffd6);
+	if(NULL==p) return;
+
+	if(3>((*p)&0x0f)) return;
+
+	cartType = ((*p) >> 4);
+	self->pro->cop = CartCopTypes[cartType];
+}
+
 static void DetectRomType_impl(RomFile* self)
 {
 	RomDetectScore rds = {0};
@@ -992,12 +1128,14 @@ static void DetectRomType_impl(RomFile* self)
 	}
 
 	/* Init rom type */
+	self->pro->map = MapMode_Unknown;
 	self->pro->type = RomType_Unknown;
+	self->pro->cop = CopType_None;
 	self->pro->hasHeader = false;
 	self->pro->rom = &self->pro->raw[0];
 	self->pro->size = self->super.pro->size;
 
-	/* Jundge RomType */
+	/* Judge RomType */
 	if(true == rds.ExHiRom.detected)
 	{
 		self->pro->map = self->pro->raw[0x40ffd5];
@@ -1011,6 +1149,7 @@ static void DetectRomType_impl(RomFile* self)
 			self->pro->rom = &self->pro->raw[0x200];
 			self->pro->size -= 0x200;
 		}
+		SetCopType(self);
 		return;
 	}
 	if(true == rds.ExLoRom.detected)
@@ -1026,6 +1165,7 @@ static void DetectRomType_impl(RomFile* self)
 			self->pro->rom = &self->pro->raw[0x200];
 			self->pro->size -= 0x200;
 		}
+		SetCopType(self);
 		return;
 	}
 	if(true == rds.HiRom.detected)
@@ -1047,6 +1187,7 @@ static void DetectRomType_impl(RomFile* self)
 			self->Snes2PcAdr = SPC7110_Snes2Pc;
 			self->Pc2SnesAdr = SPC7110_Pc2Snes;
 		}
+		SetCopType(self);
 		return;
 	}
 	if(true == rds.LoRom.detected)
@@ -1073,6 +1214,7 @@ static void DetectRomType_impl(RomFile* self)
 			self->pro->sa1adrinf.slots[2] = 0x20;
 			self->pro->sa1adrinf.slots[3] = 0x30;
 		}
+		SetCopType(self);
 		return;
 	}
 

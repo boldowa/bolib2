@@ -67,6 +67,8 @@ TEST(RomFile, new)
 	CHECK(NULL!=target->DetectRomType);
 	CHECK(NULL!=target->SearchFreeSpace);
 	CHECK(NULL!=target->HasHeader);
+	CHECK(NULL!=target->SetSA1Info);
+	CHECK(NULL!=target->GetSA1Info);
 
 	/* inherited method */
 	CHECK(NULL!=target->path_get);

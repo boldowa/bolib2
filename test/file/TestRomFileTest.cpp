@@ -10,7 +10,6 @@ TEST_GROUP(TestRomFile)
 	RomFile* target;
 	virtual void setup()
 	{
-		target = new_TestRomFile("l1024k");
 	}
 
 	virtual void teardown()
@@ -25,6 +24,7 @@ TEST_GROUP(TestRomFile)
  */
 TEST(TestRomFile, new)
 {
+	target = new_TestRomFile("l1024k");
 	CHECK(NULL != target);
 
 	/* Methods */
@@ -69,6 +69,7 @@ TEST(TestRomFile, new)
  */
 TEST(TestRomFile, delete)
 {
+	target = new_TestRomFile("l1024k");
 	delete_TestRomFile(&target);
 
 	/* check delete */
@@ -80,6 +81,7 @@ TEST(TestRomFile, delete)
  */
 TEST(TestRomFile, open)
 {
+	target = new_TestRomFile("l1024k");
 	LONGS_EQUAL(FileOpen_NoError, target->open(target));
 
 	/* check rom info */
@@ -98,6 +100,7 @@ TEST(TestRomFile, reload)
 {
 	uint8* ptr;
 
+	target = new_TestRomFile("l1024k");
 	LONGS_EQUAL(FileOpen_NoError, target->open(target));
 
 	/* write data */
@@ -119,3 +122,68 @@ TEST(TestRomFile, close)
 	/* Nothing to do here */
 }
 
+
+TEST(TestRomFile, SA1Rom)
+{
+	target = new_TestRomFile("s1024");
+	CHECK(NULL != target);
+
+	/* check initial value */
+	LONGS_EQUAL(1024*1024, target->size_get(target));
+	LONGS_EQUAL(RomType_LoRom, target->type_get(target));
+	LONGS_EQUAL(MapMode_SA1, target->mapmode_get(target));
+}
+
+
+TEST(TestRomFile, SuperFX)
+{
+	target = new_TestRomFile("g2048");
+	CHECK(NULL != target);
+
+	/* check initial value */
+	LONGS_EQUAL(1024*2048, target->size_get(target));
+	LONGS_EQUAL(RomType_LoRom, target->type_get(target));
+	LONGS_EQUAL(MapMode_20, target->mapmode_get(target));
+}
+
+TEST(TestRomFile, HiRom)
+{
+	target = new_TestRomFile("h1024");
+	CHECK(NULL != target);
+
+	/* check initial value */
+	LONGS_EQUAL(1024*1024, target->size_get(target));
+	LONGS_EQUAL(RomType_HiRom, target->type_get(target));
+	LONGS_EQUAL(MapMode_21, target->mapmode_get(target));
+}
+
+
+TEST(TestRomFile, ExLoROM)
+{
+	target = new_TestRomFile("L6144");
+	CHECK(NULL != target);
+
+	/* check initial value */
+	LONGS_EQUAL(1024*6144, target->size_get(target));
+	LONGS_EQUAL(RomType_ExLoRom, target->type_get(target));
+	LONGS_EQUAL(MapMode_25, target->mapmode_get(target));
+}
+
+
+TEST(TestRomFile, ExHiROM)
+{
+	target = new_TestRomFile("H6144");
+	CHECK(NULL != target);
+
+	/* check initial value */
+	LONGS_EQUAL(1024*6144, target->size_get(target));
+	LONGS_EQUAL(RomType_ExHiRom, target->type_get(target));
+	LONGS_EQUAL(MapMode_25, target->mapmode_get(target));
+}
+
+
+TEST(TestRomFile, TooSmall)
+{
+	target = new_TestRomFile("l1");
+	POINTERS_EQUAL(NULL, target);
+}

@@ -52,14 +52,20 @@ TestRomFile* new_TestRomFile_impl(const char* const str)
 			self->pro->map = MapMode_20;
 			break;
 
-		case 'h':	/* hirom */
-			self->pro->type = RomType_HiRom;
-			self->pro->map = MapMode_21;
-			break;
-
 		case 's':	/* sa-1rom */
 			self->pro->type = RomType_LoRom;
 			self->pro->map = MapMode_SA1;
+			break;
+
+		case 'g':	/* SuperFXrom */
+			self->pro->type = RomType_LoRom;
+			self->pro->map = MapMode_20;
+			self->pro->cop = CopType_SuperFX;
+			break;
+
+		case 'h':	/* hirom */
+			self->pro->type = RomType_HiRom;
+			self->pro->map = MapMode_21;
 			break;
 
 		case 'L':	/* exlorom */
@@ -169,12 +175,27 @@ static E_FileOpen dummyOpen(RomFile* self)
 	/* Generate snes header */
 	raw[headerBase+0x15] = self->mapmode_get(self);
 	raw[headerBase+0x17] = mb;
+	switch(self->pro->cop)
+	{
+		/* TODO: Other Co-processer */
+
+		case CopType_SuperFX:
+			raw[headerBase+0x16] = 0x15;
+		default:
+			break;
+	}
 	write16(&raw[headerBase+0x1c], 0x0000);
 	write16(&raw[headerBase+0x1e], 0xffff);
 	self->pro->raw = raw;
 
 	/* Set address convert methods */
 	self->DetectRomType(self);
+#if 0
+	/* debug printer */
+	printf("RomType: 0x%02x\n", self->pro->type);
+	printf("MapType: 0x%02x\n", self->pro->map);
+	printf("CopType: 0x%02x\n", self->pro->cop);
+#endif
 
 	/* calculate checksum & update */
 	self->ChecksumUpdate(self);
