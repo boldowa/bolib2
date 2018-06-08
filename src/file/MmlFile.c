@@ -43,9 +43,10 @@ MmlFile* new_MmlFile_impl(const char* const path)
 	pri = calloc(1, sizeof(MmlFile_private));
 
 	/* check whether object creatin succeeded */
+	assert(super);
+	assert(self);
 	assert(pro);
 	assert(pri);
-	assert(self);
 
 	/* inherit */
 	memcpy(&self->super, super, sizeof(TextFile));

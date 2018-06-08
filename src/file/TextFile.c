@@ -32,7 +32,7 @@ static void overrider_impl(TextFile* self);
  *
  * @return the pointer of object
  */
-TextFile* new_TextFile(const char* const path)
+TextFile* new_TextFile_impl(const char* const path)
 {
 	File* super;
 	TextFile* self;
@@ -98,7 +98,7 @@ void delete_TextFile_members(TextFile* self)
  *
  * @param the pointer of object
  */
-void delete_TextFile(TextFile** self)
+void delete_TextFile_impl(TextFile** self)
 {
 	/* This is the template that default destractor. */
 	assert(self);
