@@ -202,7 +202,7 @@ TEST(RomFile_Address, SA1ROM_Snes2Pc_mbon)
 
 	/* Set SA1 address conversion mode */
 	sa1inf.useHiRomMap	= false;	/**< Use LoROM Address conversion mode */
-	sa1inf.slots[0]		= 0x2;		/**< Slot[0] : PC $38:0000 - $47:ffff */
+	sa1inf.slots[0]		= 0x2;		/**< Slot[0] : PC $20:0000 - $2f:ffff */
 	target->SetSA1Info(target, sa1inf);
 
 	/*--- Snes2Pc LoROM-like ---*/
