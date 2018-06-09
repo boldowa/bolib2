@@ -56,7 +56,8 @@ typedef enum CopType {
  */
 typedef struct _SA1AdrInfo {
 	bool		useHiRomMap;
-	uint8		slots[4];
+	uint8		slots[4];		/**< Slot number(SuperMMC Bank) */
+	bool		mbits[4];		/**< SuperMMC XBM bit */
 } SA1AdrInfo;
 
 /**

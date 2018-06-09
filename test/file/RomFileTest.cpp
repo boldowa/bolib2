@@ -362,6 +362,41 @@ TEST(RomFile, SearchFreeSpace)
 	LONGS_EQUAL(ROMADDRESS_NULL,target->SearchFreeSpace(target, 0x7ff9))
 }
 
+TEST(RomFile, GetSA1Info_SetSA1Info)
+{
+	SA1AdrInfo sai, csai;
+
+	sai = target->GetSA1Info(target);
+	LONGS_EQUAL(0, sai.slots[0]);
+	LONGS_EQUAL(0, sai.slots[1]);
+	LONGS_EQUAL(0, sai.slots[2]);
+	LONGS_EQUAL(0, sai.slots[3]);
+	CHECK_FALSE(sai.mbits[0]);
+	CHECK_FALSE(sai.mbits[1]);
+	CHECK_FALSE(sai.mbits[2]);
+	CHECK_FALSE(sai.mbits[3]);
+	CHECK_FALSE(sai.useHiRomMap);
+
+	csai = sai;
+	csai.slots[0] = 0x37;
+	csai.slots[1] = 0x11;
+	csai.slots[2] = 0x5;
+	csai.mbits[0] = true;
+	csai.useHiRomMap = true;
+
+	target->SetSA1Info(target, csai);
+	sai = target->GetSA1Info(target);
+	LONGS_EQUAL(7,             sai.slots[0]);
+	LONGS_EQUAL(1,             sai.slots[1]);
+	LONGS_EQUAL(5,             sai.slots[2]);
+	LONGS_EQUAL(csai.slots[3], sai.slots[3]);
+	LONGS_EQUAL(true,          sai.mbits[0]);
+	LONGS_EQUAL(csai.mbits[1], sai.mbits[1]);
+	LONGS_EQUAL(csai.mbits[2], sai.mbits[2]);
+	LONGS_EQUAL(csai.mbits[3], sai.mbits[3]);
+	LONGS_EQUAL(csai.useHiRomMap, sai.useHiRomMap);
+}
+
 TEST_GROUP(RomFile_SA1)
 {
 	/* test target */

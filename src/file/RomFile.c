@@ -56,6 +56,7 @@ static SA1AdrInfo GetSA1Info_impl(RomFile* self);
 /* default handler */
 static uint32 NullSnesAdr(RomFile* self, const uint32 ad);
 
+static const uint8 DefaultSlots[4] = {0, 1, 2, 3};
 
 /*--------------- Constructor / Destructor ---------------*/
 
@@ -99,6 +100,11 @@ RomFile* new_RomFile_impl(const char* const path)
 	pro->rom = NULL;
 	pro->raw = NULL;
 	pro->sa1adrinf.useHiRomMap = false;
+	{int i; for(i=0; i<4; i++)
+	{
+		pro->sa1adrinf.slots[i] = 0;
+		pro->sa1adrinf.mbits[i] = false;
+	}}
 	pro->sa1adrinf.slots[0] = 0;
 	pro->sa1adrinf.slots[1] = 0;
 	pro->sa1adrinf.slots[2] = 0;
@@ -563,7 +569,14 @@ static bool HasHeader_impl(RomFile* self)
 
 static void SetSA1Info_impl(RomFile* self, const SA1AdrInfo sa1inf)
 {
-	memcpy(&self->pro->sa1adrinf, &sa1inf, sizeof(SA1AdrInfo));
+	int i;
+
+	self->pro->sa1adrinf.useHiRomMap = sa1inf.useHiRomMap;
+	for(i=0;i<4;i++)
+	{
+		self->pro->sa1adrinf.mbits[i] = sa1inf.mbits[i];
+		self->pro->sa1adrinf.slots[i] = (sa1inf.slots[i]&7);
+	}
 }
 
 
@@ -722,6 +735,19 @@ static uint32 SA1_Pc2Snes(RomFile* self, const uint32 pca)
  * New SA-1 Address convert functions.
  * It supports SuperMMC Slot changes feature.
  */
+
+static uint8 SA1_GetSlotValue(RomFile* self, const int slotInx)
+{
+	uint8 slotValue;
+
+	slotValue = DefaultSlots[slotInx];
+	if(self->pro->sa1adrinf.mbits[slotInx])
+	{
+		slotValue = self->pro->sa1adrinf.slots[slotInx];
+	}
+	return slotValue;
+}
+
 static uint32 SA1_Snes2Pc(RomFile* self, const uint32 sna)
 {
 	uint32 pca;
@@ -780,26 +806,35 @@ static uint32 SA1_Snes2Pc(RomFile* self, const uint32 sna)
 	/* Calculate PC address */
 	if(isHiRomMap)
 	{
-		pca = (uint32)((((self->pro->sa1adrinf.slots[slot])+((uint32)bnk&0x0f)) << 16) + ((uint32)sna & 0xffff));
+		pca = (uint32)(((((uint32)self->pro->sa1adrinf.slots[slot]<<4)+((uint32)bnk&0x0f)) << 16) + ((uint32)sna & 0xffff));
 	}
 	else
 	{
-		pca = (uint32)(((uint32)self->pro->sa1adrinf.slots[slot] << 16) + (((uint32)bnk&0x1f) << 15) + ((uint32)sna & 0x7fff));
+		pca = (uint32)(((uint32)SA1_GetSlotValue(self,slot) << 20) + (((uint32)bnk&0x1f) << 15) + ((uint32)sna & 0x7fff));
 	}
 
 	if(self->pro->size <= pca) return ROMADDRESS_NULL;
 	return pca;
 }
-static int SA1_GetSlotIndex(RomFile* self, const uint32 pca)
+static int SA1_GetSlotIndex(RomFile* self, const uint32 pca, const bool force)
 {
 	int i;
-	const uint8 bnk = (uint8)(pca>>16);
+	const uint8 bnk = (uint8)(pca>>20);
 	for(i=0; i<4; i++)
 	{
-		if(self->pro->sa1adrinf.slots[i] <= bnk
-				&& self->pro->sa1adrinf.slots[i] + 16 > bnk)
+		if(self->pro->sa1adrinf.mbits[i]||force)
 		{
-			return i;
+			if(self->pro->sa1adrinf.slots[i] == bnk)
+			{
+				return i;
+			}
+		}
+		else
+		{
+			if(DefaultSlots[i] == bnk)
+			{
+				return i;
+			}
 		}
 	}
 	return -1;
@@ -812,11 +847,11 @@ static uint32 SA1_Pc2Snes_LoRom(RomFile* self, const uint32 pca)
 	static const uint32 slotAdds[4] = {0x000000, 0x200000, 0x800000, 0xa00000};
 
 	/* Get slot & base */
-	slotInx = SA1_GetSlotIndex(self, pca);
+	slotInx = SA1_GetSlotIndex(self, pca, false);
 	if(0>slotInx) return ROMADDRESS_NULL;
 
 	add = slotAdds[slotInx];
-	base = pca - ((uint32)self->pro->sa1adrinf.slots[slotInx] << 16);
+	base = pca - ((uint32)SA1_GetSlotValue(self,slotInx) << 20);
 
 	/* calculate address */
 	return add + ((base&0x0f8000)<<1) + ((0x7fff&base)|0x8000);
@@ -828,11 +863,11 @@ static uint32 SA1_Pc2Snes_HiRom(RomFile* self, const uint32 pca)
 	uint32 add = 0;
 
 	/* Get slot & base */
-	slotInx = SA1_GetSlotIndex(self, pca);
+	slotInx = SA1_GetSlotIndex(self, pca, true);
 	if(0>slotInx) return ROMADDRESS_NULL;
 
 	add = (uint32)(slotInx << 20);
-	base = pca - ((uint32)self->pro->sa1adrinf.slots[slotInx] << 16);
+	base = pca - ((uint32)self->pro->sa1adrinf.slots[slotInx] << 20);
 
 	/* calculate address */
 	return 0xc00000 + add + (base&0x0fffff);
@@ -1209,10 +1244,11 @@ static void DetectRomType_impl(RomFile* self)
 			self->Pc2SnesAdr = SA1_Pc2Snes;
 			/* init sa-1 bankmap */
 			self->pro->sa1adrinf.useHiRomMap = false;
-			self->pro->sa1adrinf.slots[0] = 0x00;
-			self->pro->sa1adrinf.slots[1] = 0x10;
-			self->pro->sa1adrinf.slots[2] = 0x20;
-			self->pro->sa1adrinf.slots[3] = 0x30;
+			{int i; for(i=0; i<4; i++)
+			{
+				self->pro->sa1adrinf.slots[i] = (uint8)i;
+				self->pro->sa1adrinf.mbits[i] = false;
+			}}
 		}
 		SetCopType(self);
 		return;
