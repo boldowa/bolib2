@@ -19,6 +19,15 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
 	set(BOLIB2_EXECUTE_TEST OFF)
 endif()
 
+set(BOLIB_VERSION "0.0.1")
+set(BOLIB_INCDIR_NAME "bolib")
+set(BOLIB_PC "bolib.pc")
+set(INSTALL_BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin" CACHE PATH "Installation directory for executables")
+set(INSTALL_LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE PATH "Installation directory for libraries")
+set(INSTALL_INC_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "Installation directory for headers")
+set(INSTALL_MAN_DIR "${CMAKE_INSTALL_PREFIX}/share/man" CACHE PATH "Installation directory for manual pages")
+set(INSTALL_PKGCONFIG_DIR "${CMAKE_INSTALL_PREFIX}/share/pkgconfig" CACHE PATH "Installation directory for pkgconfig (.pc) files")
+
 project(bolib2)
 
 # GLOBAL
@@ -26,6 +35,17 @@ if(UNIX)
 	set(CMAKE_C_FLAGS_DEBUG   "-O0 -g3")
 	set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
 endif(UNIX)
+
+# configure
+check_include_files(cstdint HAVE_CSTDINT)
+check_include_files(stdbool.h HAVE_STDBOOL_H)
+check_include_files(stdint.h HAVE_STDINT_H)
+check_include_files(inttypes.h HAVE_INTTYPES_H)
+check_include_files(sys/types.h.h HAVE_SYS_TYPES_H)
+configure_file("${PROJECT_SOURCE_DIR}/include/int_type.h.in" "${PROJECT_BINARY_DIR}/int_type.h")
+configure_file("${PROJECT_SOURCE_DIR}/include/btypes.h.in" "${PROJECT_BINARY_DIR}/btypes.h")
+configure_file("${PROJECT_SOURCE_DIR}/bolib.h.in" "${PROJECT_BINARY_DIR}/bolib.h" @ONLY)
+configure_file("${PROJECT_SOURCE_DIR}/bolib.pc.in" "${PROJECT_BINARY_DIR}/${BOLIB_PC}" @ONLY)
 
 add_subdirectory(ext)
 add_subdirectory(src)

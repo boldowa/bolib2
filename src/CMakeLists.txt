@@ -16,15 +16,6 @@ file(GLOB_RECURSE PRJCPPSOURCES
 list(FILTER PRJCSOURCES EXCLUDE REGEX ".*main.c$")
 list(FILTER PRJCPPSOURCES EXCLUDE REGEX ".*main.cpp$")
 
-# configure
-check_include_files(cstdint HAVE_CSTDINT)
-check_include_files(stdbool.h HAVE_STDBOOL_H)
-check_include_files(stdint.h HAVE_STDINT_H)
-check_include_files(inttypes.h HAVE_INTTYPES_H)
-check_include_files(sys/types.h.h HAVE_SYS_TYPES_H)
-configure_file("${PROJECT_SOURCE_DIR}/include/int_type.h.in" "${PROJECT_BINARY_DIR}/int_type.h")
-configure_file("${PROJECT_SOURCE_DIR}/include/btypes.h.in" "${PROJECT_BINARY_DIR}/btypes.h")
-
 add_library(bolib2 ${PRJCSOURCES} ${PRJCPPSOURCES})
 target_include_directories(bolib2 PRIVATE
 	"${PROJECT_BINARY_DIR}"
@@ -51,4 +42,27 @@ set_target_properties(bolib2 PROPERTIES COMPILE_FLAGS ${BOLIB2_FLAGS})
 add_executable(bolib2_exe main.c)
 target_link_libraries(bolib2_exe bolib2)
 set_target_properties(bolib2_exe PROPERTIES OUTPUT_NAME bolib2)
+
+
+# Install
+if("Release" STREQUAL ${CMAKE_BUILD_TYPE})
+	if(NOT BOLIB_SKIP_INSTALL)
+		# binary
+		install(TARGETS bolib2
+			RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
+			ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
+			LIBRARY DESTINATION "${INSTALL_LIB_DIR}" )
+		# headers
+		install(DIRECTORY "${PROJECT_SOURCE_DIR/include}"
+			DESTINATION "${INSTALL_INC_DIR}/${BOLIB_INCDIR_NAME}"
+			FILES_MATCHING PATTERN "*.h")
+		install(FILES "${PROJECT_BINARY_DIR}/bolib.h" DESTINATION "${INSTALL_INC_DIR}")
+		install(FILES
+			"${PROJECT_BINARY_DIR}/btypes.h"
+			"${PROJECT_BINARY_DIR}/int_type.h"
+			DESTINATION "${INSTALL_INC_DIR}/${BOLIB_INCDIR_NAME}")
+		# package config
+		install(FILES "${PROJECT_BINARY_DIR}/${BOLIB_PC}" DESTINATION "${INSTALL_PKGCONFIG_DIR}")
+	endif(NOT BOLIB_SKIP_INSTALL)
+endif("Release" STREQUAL ${CMAKE_BUILD_TYPE})
 

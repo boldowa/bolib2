@@ -4,7 +4,7 @@
 #ifndef MMLFILE_H
 #define MMLFILE_H
 
-#include <btypes.h>
+#include "btypes.h"
 #include "TextFile.h"
 
 #ifdef __cplusplus

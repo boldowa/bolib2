@@ -4,7 +4,7 @@
 #ifndef STR_H
 #define STR_H
 
-#include <btypes.h>
+#include "btypes.h"
 
 #ifdef __cplusplus
 extern "C" {

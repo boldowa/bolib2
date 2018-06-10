@@ -4,7 +4,7 @@
 #ifndef TESTROMFILE_H
 #define TESTROMFILE_H
 
-#include <btypes.h>
+#include "btypes.h"
 #include "file/File.h"
 #include "file/RomFile.h"
 

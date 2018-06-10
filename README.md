@@ -15,7 +15,7 @@ This library is written in C language.
 
 ## TODO
 
-- [ ] port feature from bolib
-- [ ] public header
+- [x] port feature from bolib
+- [x] public header  (\*Haven't tested yet)
 - [ ] manual
 

@@ -4,7 +4,7 @@
 #ifndef TEXTFILE_H
 #define TEXTFILE_H
 
-#include <btypes.h>
+#include "btypes.h"
 #include "File.h"
 
 #ifdef __cplusplus
