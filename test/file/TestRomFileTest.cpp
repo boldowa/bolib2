@@ -2,6 +2,7 @@
  * @file TestRomFileTest.cpp
  */
 #include <CppUTest/TestHarness.h>
+#include <memory.h>
 #include "memory/bmem.h"
 #include "file/TestRomFile.h"
 
@@ -186,4 +187,24 @@ TEST(TestRomFile, TooSmall)
 {
 	target = new_TestRomFile("l1");
 	POINTERS_EQUAL(NULL, target);
+}
+
+
+TEST(TestRomFile, SearchFreeSpace)
+{
+	SA1AdrInfo sa1inf;
+	uint8 i;
+	uint8 *p;
+
+	for(i=0; i<4; i++)
+	{
+		sa1inf.slots[i] = (uint8)(i+4);
+		sa1inf.mbits[i] = false;
+	}
+	target = new_TestRomFile("s6144");
+	LONGS_EQUAL(FileOpen_NoError, target->open(target));
+	target->SetSA1Info(target, sa1inf);
+	p = target->GetPcPtr(target, 0x80000);
+	memset(p, 0xff, 1024*1024*5);
+	LONGS_EQUAL(0xd80000, target->SearchFreeSpace(target, 0x200));
 }

@@ -127,6 +127,7 @@ static E_FileOpen dummyOpen(RomFile* self)
 
 	raw = (uint8*)malloc((size_t)self->pro->size * sizeof(uint8));
 	assert(raw);
+	memset(raw, FILL, (size_t)self->pro->size);
 
 	switch(self->mapmode_get(self))
 	{

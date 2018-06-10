@@ -517,7 +517,7 @@ static uint32 SearchFreeSpace_impl(RomFile* self, const uint32 len)
 	uint32 locContinue;
 	uint8 *end;
 
-	if(0x800000>self->pro->size) return ROMADDRESS_NULL;
+	if(0x80000>=self->pro->size) return ROMADDRESS_NULL;
 
 	end = self->GetPcPtr(self, (uint32)self->pro->size-1);
 	bnksize = 0x8000;
@@ -541,7 +541,7 @@ static uint32 SearchFreeSpace_impl(RomFile* self, const uint32 len)
 
 	/* set range */
 	top = self->GetPcPtr(self, 0x80000);
-	tail = top + bnksize-1;
+	tail = top + bnksize;
 
 	/* search space */
 	locContinue = 0;
@@ -831,15 +831,23 @@ static uint32 SA1_Pc2Snes_HiRom(RomFile* self, const uint32 pca)
 }
 static uint32 SA1_Pc2Snes(RomFile* self, const uint32 pca)
 {
+	uint32 sna;
+
 	if(self->pro->size <= pca) return ROMADDRESS_NULL;
 	if(0x800000 <= pca) return ROMADDRESS_NULL;
 
 	if(self->pro->sa1adrinf.useHiRomMap)
 	{
-		return SA1_Pc2Snes_HiRom(self,pca);
+		sna = SA1_Pc2Snes_HiRom(self, pca);
+		if(ROMADDRESS_NULL == sna)
+			sna = SA1_Pc2Snes_LoRom(self, pca);
+		return sna;
 	}
 
-	return SA1_Pc2Snes_LoRom(self, pca);
+	sna = SA1_Pc2Snes_LoRom(self, pca);
+	if(ROMADDRESS_NULL == sna)
+		sna = SA1_Pc2Snes_HiRom(self,pca);
+	return sna;
 }
 #endif
 
