@@ -753,63 +753,20 @@ static uint32 SA1_Snes2Pc(RomFile* self, const uint32 sna)
 	uint32 pca;
 	int slot;
 	uint8 bnk = (uint8)(sna >> 16);
-	bool isHiRomMap;
+	static const uint8 LoSlots[8] = {0x00,0x01,0xff,0xff,0x02,0x03,0xff,0xff};
 
 	if(!IsValidSnesAddressCommon(self,sna)) return ROMADDRESS_NULL;
 
-	/* Detects address type */
-	if((0x00 <= bnk) && (0x20 > bnk))
+	/* HiRom address area */
+	if(0xc0 <= bnk)
 	{
-		slot = 0;
-		isHiRomMap = false;
-	}
-	else if((0x20 <= bnk) && (0x40 > bnk))
-	{
-		slot = 1;
-		isHiRomMap = false;
-	}
-	else if((0x80 <= bnk) && (0xa0 > bnk))
-	{
-		slot = 2;
-		isHiRomMap = false;
-	}
-	else if((0xa0 <= bnk) && (0xc0 > bnk))
-	{
-		slot = 3;
-		isHiRomMap = false;
-	}
-	else if((0xc0 <= bnk) && (0xcf >= bnk))
-	{
-		slot = 0;
-		isHiRomMap = true;
-	}
-	else if((0xd0 <= bnk) && (0xdf >= bnk))
-	{
-		slot = 1;
-		isHiRomMap = true;
-	}
-	else if((0xe0 <= bnk) && (0xef >= bnk))
-	{
-		slot = 2;
-		isHiRomMap = true;
-	}
-	else if((0xf0 <= bnk) && (0xff >= bnk))
-	{
-		slot = 3;
-		isHiRomMap = true;
-	}
-	else
-	{
-		return ROMADDRESS_NULL;
-	}
-
-	/* Calculate PC address */
-	if(isHiRomMap)
-	{
+		slot = ((bnk&0x30)>>4);
 		pca = (uint32)(((((uint32)self->pro->sa1adrinf.slots[slot]<<4)+((uint32)bnk&0x0f)) << 16) + ((uint32)sna & 0xffff));
 	}
-	else
+	else /* LoRom address area etc */
 	{
+		slot = LoSlots[((bnk&0xf0)>>5)];
+		if(0xff==slot) return ROMADDRESS_NULL;
 		pca = (uint32)(((uint32)SA1_GetSlotValue(self,slot) << 20) + (((uint32)bnk&0x1f) << 15) + ((uint32)sna & 0x7fff));
 	}
 
