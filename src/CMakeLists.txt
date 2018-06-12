@@ -39,7 +39,7 @@ if(NOT MSVC)
 endif(NOT MSVC)
 set_target_properties(bolib2 PROPERTIES COMPILE_FLAGS ${BOLIB2_FLAGS})
 
-add_executable(bolib2_exe main.c)
+add_executable(bolib2_exe bolib/main.c)
 target_link_libraries(bolib2_exe bolib2)
 set_target_properties(bolib2_exe PROPERTIES OUTPUT_NAME bolib2)
 
@@ -52,14 +52,18 @@ if("Release" STREQUAL ${CMAKE_BUILD_TYPE})
 			RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
 			ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
 			LIBRARY DESTINATION "${INSTALL_LIB_DIR}" )
+		message(STATUS "install(TARGETS bolib2")
+		message(STATUS "	RUNTIME DESTINATION \"${INSTALL_BIN_DIR}\"")
+		message(STATUS "	ARCHIVE DESTINATION \"${INSTALL_LIB_DIR}\"")
+		message(STATUS "	LIBRARY DESTINATION \"${INSTALL_LIB_DIR}\" )")
 		# headers
-		install(DIRECTORY "${PROJECT_SOURCE_DIR/include}"
-			DESTINATION "${INSTALL_INC_DIR}/${BOLIB_INCDIR_NAME}"
+		install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/${BOLIB_INCDIR_NAME}"
+			DESTINATION "${INSTALL_INC_DIR}"
 			FILES_MATCHING PATTERN "*.h")
 		install(FILES "${PROJECT_BINARY_DIR}/bolib.h" DESTINATION "${INSTALL_INC_DIR}")
 		install(FILES
-			"${PROJECT_BINARY_DIR}/btypes.h"
-			"${PROJECT_BINARY_DIR}/int_type.h"
+			"${PROJECT_BINARY_DIR}/${BOLIB_INCDIR_NAME}/btypes.h"
+			"${PROJECT_BINARY_DIR}/${BOLIB_INCDIR_NAME}/int_type.h"
 			DESTINATION "${INSTALL_INC_DIR}/${BOLIB_INCDIR_NAME}")
 		# package config
 		install(FILES "${PROJECT_BINARY_DIR}/${BOLIB_PC}" DESTINATION "${INSTALL_PKGCONFIG_DIR}")

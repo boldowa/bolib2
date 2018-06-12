@@ -1,0 +1,36 @@
+/**
+ * @file bolib.h
+ */
+#ifndef _BOLIB_H
+#define _BOLIB_H
+
+/**
+ * Uncomment it when you don't want to declare standard int types
+ * in bolib.
+ */
+/* #define _BOLIB_INT_DEFINED */
+
+
+/** Include common define */
+#include "@BOLIB_INCDIR_NAME@/btypes.h"
+
+/** include memory modules */
+#include "@BOLIB_INCDIR_NAME@/memory/bmem.h"
+
+/** Include data module headers */
+#include "@BOLIB_INCDIR_NAME@/data/Str.h"
+#include "@BOLIB_INCDIR_NAME@/data/Iterator.h"
+#include "@BOLIB_INCDIR_NAME@/data/List.h"
+#include "@BOLIB_INCDIR_NAME@/data/Vector.h"
+
+/** Include file module headers */
+#include "@BOLIB_INCDIR_NAME@/file/FilePath.h"
+#include "@BOLIB_INCDIR_NAME@/file/libfile.h"
+/* #include "@BOLIB_INCDIR_NAME@/file/File.h" */
+/* #include "@BOLIB_INCDIR_NAME@/file/TextFile.h" */
+/* #include "@BOLIB_INCDIR_NAME@/file/MmlFile.h" */
+/* #include "@BOLIB_INCDIR_NAME@/file/RomFile.h" */
+/* #include "@BOLIB_INCDIR_NAME@/file/TestRomFile.h" */
+
+
+#endif

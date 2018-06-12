@@ -1,0 +1,79 @@
+/**
+ * @file btypes.h
+ */
+#ifndef BTYPES_H
+#define BTYPES_H
+#include <stddef.h>
+#include "int_type.h"
+
+/* Environment defines */
+#cmakedefine WINDOWS 1
+#cmakedefine WIN32 1
+#cmakedefine UNIX 1
+#cmakedefine LINUX 1
+#cmakedefine APPLE 1
+#cmakedefine MINGW 1
+#cmakedefine CYGWIN 1
+
+#if WINDOWS || WIN32
+#  define isWindows 1
+#endif
+#if UNIX
+#  define isUnix 1
+#endif
+#if LINUX
+#  define isLinux 1
+#endif
+
+#if isWindows
+#  ifndef WINVER
+#    define WINVER 0x0400 /* WINNT */
+#  endif
+#  define WIN32_LEAN_AND_MEAN
+#  include <windows.h>
+#  define popen _popen
+#  define pclose _pclose
+#endif
+
+#if defined(_MSC_VER)
+   /* MSVC funcs */
+#  define strncasecmp _strnicmp
+#  define strcasecmp _stricmp
+#  if WINVER >= 0x0502
+#    define fopen(fn,m) _fopen_b(fn,m,__func__)
+     FILE* _fopen_b(const char*, const char*, const char*);
+#  endif
+#endif
+
+/**
+ * @brief define maxpath
+ */
+#ifndef MAX_PATH
+  #define MAX_PATH 260
+#endif
+
+/**
+ * @brief define __func__ for old Visual Studio
+ */
+#ifndef __func__
+#  ifdef __FUNCTION__
+#    define __func__ __FUNCTION__
+#  endif
+#endif
+
+
+/**
+ * string secure function overwrap for except visual studio
+ */
+#ifndef _MSC_VER
+#  define strcpy_s(dst, len, src) strcpy(dst, src)
+#  define strncpy_s(dst, len, src, cnt) strncpy(dst, src, cnt)
+#  define strcat_s(s1, len, s2) strcat(s1, s2)
+#  define strncat_s(s1, len, s2, cnt) strncat(s1, s2, cnt)
+#if !defined(__STDC__)
+#  define sprintf_s(buf, len, fmt, ...)  sprintf(buf, fmt, ##__VA_ARGS__)
+#  define _stprintf_s(buf, len, fmt, ...)  sprintf(buf, fmt, ##__VA_ARGS__)
+#endif
+#endif
+
+#endif
