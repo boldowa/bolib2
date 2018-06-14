@@ -22,6 +22,8 @@ long fsize(const char* const);
 
 bool makedir(const char* const);
 
+char* getworkdir(const char* const);
+
 /*--- (!)CAUTION(!) Don't edit this comment! ---*/
 
 #ifdef __cplusplus

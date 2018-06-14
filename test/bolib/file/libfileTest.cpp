@@ -104,5 +104,14 @@ TEST(libfileTest, makedir)
 }
 
 
+/**
+ * Check getworkdir
+ */
+TEST(libfile, getworkdir)
+{
+	/* TODO: Write test code. */
+}
+
+
 /*--- (!)CAUTION(!) Don't edit this comment! ---*/
 

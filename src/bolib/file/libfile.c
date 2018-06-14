@@ -8,10 +8,9 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
-#if isWindows
-#  include <stdlib.h>
-#else
+#if !isWindows
 #  include <sys/stat.h>
 #endif
 #include "bolib/data/Str.h"
@@ -169,6 +168,31 @@ bool makedir(const char* const path)
 #else
 	return (0 == mkdir(path, 0755));
 #endif
+}
+
+
+/**
+ * @brief TODO: Write summary.
+ */
+char* getworkdir(const char* const basename)
+{
+	char* tmpdir = NULL;
+	char* workdir = NULL;
+
+	tmpdir = gettmpdir();
+	workdir = Str_concat(tmpdir, basename);
+	free(tmpdir);
+
+	if(!dexists(workdir))
+	{
+		if(!makedir(workdir))
+		{
+			free(workdir);
+			return NULL;
+		}
+	}
+
+	return workdir;
 }
 
 

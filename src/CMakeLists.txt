@@ -3,7 +3,7 @@
 #-------------------------------------------------
 
 # Compile flags
-set(BOLIB2_FLAGS "-Wall -Wpedantic -Wno-format -Wconversion -Wimplicit-function-declaration -ansi")
+set(BOLIB2_FLAGS "-Wall -Wpedantic -Wno-format -Wconversion -Wimplicit-function-declaration")
 
 # Compile All sources
 file(GLOB_RECURSE PRJCSOURCES
@@ -52,10 +52,10 @@ if("Release" STREQUAL ${CMAKE_BUILD_TYPE})
 			RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
 			ARCHIVE DESTINATION "${INSTALL_LIB_DIR}"
 			LIBRARY DESTINATION "${INSTALL_LIB_DIR}" )
-		message(STATUS "install(TARGETS bolib2")
-		message(STATUS "	RUNTIME DESTINATION \"${INSTALL_BIN_DIR}\"")
-		message(STATUS "	ARCHIVE DESTINATION \"${INSTALL_LIB_DIR}\"")
-		message(STATUS "	LIBRARY DESTINATION \"${INSTALL_LIB_DIR}\" )")
+		#message(STATUS "install(TARGETS bolib2")
+		#message(STATUS "	RUNTIME DESTINATION \"${INSTALL_BIN_DIR}\"")
+		#message(STATUS "	ARCHIVE DESTINATION \"${INSTALL_LIB_DIR}\"")
+		#message(STATUS "	LIBRARY DESTINATION \"${INSTALL_LIB_DIR}\" )")
 		# headers
 		install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/${BOLIB_INCDIR_NAME}"
 			DESTINATION "${INSTALL_INC_DIR}"

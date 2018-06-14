@@ -69,20 +69,20 @@ if(BOLIB2_EXECUTE_TEST)
 	add_subdirectory(test)
 	add_custom_target(prepare_test
 		COMMAND ${CMAKE_COMMAND} -E echo "-- Prepareing test data..."
-		COMMAND ${CMAKE_COMMAND} -E echo "   copy_directory \"${PROJECT_SOURCE_DIR}/testdata\" \"${CMAKE_BINARY_DIR}/testdata\""
-		COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/testdata" "${CMAKE_BINARY_DIR}/testdata"
-		COMMAND ${CMAKE_COMMAND} -E echo "   remove_directory \"${CMAKE_BINARY_DIR}/testdata/@out\""
-		COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/testdata/@out"
-		COMMAND ${CMAKE_COMMAND} -E echo "   make_directory \"${CMAKE_BINARY_DIR}/testdata/@out\""
-		COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/testdata/@out"
+		COMMAND ${CMAKE_COMMAND} -E echo "   copy_directory \"${PROJECT_SOURCE_DIR}/testdata\" \"${PROJECT_BINARY_DIR}/testdata\""
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/testdata" "${PROJECT_BINARY_DIR}/testdata"
+		COMMAND ${CMAKE_COMMAND} -E echo "   remove_directory \"${PROJECT_BINARY_DIR}/testdata/@out\""
+		COMMAND ${CMAKE_COMMAND} -E remove_directory "${PROJECT_BINARY_DIR}/testdata/@out"
+		COMMAND ${CMAKE_COMMAND} -E echo "   make_directory \"${PROJECT_BINARY_DIR}/testdata/@out\""
+		COMMAND ${CMAKE_COMMAND} -E make_directory "${PROJECT_BINARY_DIR}/testdata/@out"
 		)
 	add_custom_target(check ALL
 		COMMAND ${CMAKE_COMMAND} -E echo "+++++ Test starts... +++++"
 		COMMAND ${CMAKE_COMMAND} -E echo "-- Executes bolib2_test ..."
 		COMMAND $<TARGET_FILE:bolib2_test> -c
 		COMMAND ${CMAKE_COMMAND} -E echo "-- Removing test data..."
-		COMMAND ${CMAKE_COMMAND} -E echo "   remove_directory \"${CMAKE_BINARY_DIR}/testdata/@out\""
-		COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/testdata/@out"
+		COMMAND ${CMAKE_COMMAND} -E echo "   remove_directory \"${PROJECT_BINARY_DIR}/testdata/@out\""
+		COMMAND ${CMAKE_COMMAND} -E remove_directory "${PROJECT_BINARY_DIR}/testdata/@out"
 		COMMAND ${CMAKE_COMMAND} -E echo "+++++ done. +++++"
 		)
 	enable_testing()
