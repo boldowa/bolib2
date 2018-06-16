@@ -73,6 +73,13 @@ TEST(libfileTest, gettmpdir)
 TEST(libfileTest, abspath)
 {
 	/* TODO: Write test code. */
+	char* apath;
+
+	apath = abspath(".");
+	CHECK(NULL != apath);
+	CHECK(0 != strcmp(".",apath));
+
+	free(apath);
 }
 
 
@@ -107,9 +114,24 @@ TEST(libfileTest, makedir)
 /**
  * Check getworkdir
  */
-TEST(libfile, getworkdir)
+TEST(libfileTest, getworkdir)
 {
 	/* TODO: Write test code. */
+#if isWindows
+	FAIL("?????");
+#else
+	const static char* dirpath = "/tmp/dwork/";
+	char* workdir;
+
+	/* check */
+	workdir = getworkdir("dwork/");
+	CHECK(NULL != workdir);
+	STRCMP_EQUAL(dirpath, workdir);
+	CHECK(dexists(dirpath));
+
+	/* clean */
+	free(workdir);
+#endif
 }
 
 

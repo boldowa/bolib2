@@ -13,6 +13,7 @@
 #if !isWindows
 #  include <sys/stat.h>
 #endif
+#include <string.h>
 #include "bolib/data/Str.h"
 #include "bolib/file/libfile.h"
 
@@ -116,7 +117,25 @@ char* gettmpdir(void)
  */
 char* abspath(const char* const path)
 {
-	return NULL;
+	char* s;
+	s = calloc(sizeof(char), MAX_PATH);
+	assert(s);
+#if isWindows
+	if(0 == GetFullPathName(path, MAX_PATH, s, NULL))
+	{
+		free(s);
+		return NULL;
+	}
+#else
+	if(NULL == realpath(path, s) || MAX_PATH-1 <= strlen(s))
+	{
+		free(s);
+		return NULL;
+	}
+	s[strlen(s)+1] = '\0';
+	s[strlen(s)] = '/';
+#endif
+	return s;
 }
 
 
