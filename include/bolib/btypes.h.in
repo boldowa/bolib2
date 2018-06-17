@@ -8,20 +8,22 @@
 
 /* Environment defines */
 #cmakedefine WINDOWS 1
+#ifndef WIN32
 #cmakedefine WIN32 1
+#endif
 #cmakedefine UNIX 1
 #cmakedefine LINUX 1
 #cmakedefine APPLE 1
 #cmakedefine MINGW 1
 #cmakedefine CYGWIN 1
 
-#if WINDOWS || WIN32
+#if defined(WINDOWS) || defined(WIN32)
 #  define isWindows 1
 #endif
-#if UNIX
+#if defined(UNIX)
 #  define isUnix 1
 #endif
-#if LINUX
+#if defined(LINUX)
 #  define isLinux 1
 #endif
 
@@ -73,5 +75,13 @@
 #  define sprintf_s(buf, len, fmt, ...)  sprintf(buf, fmt, ##__VA_ARGS__)
 #  define _stprintf_s(buf, len, fmt, ...)  sprintf(buf, fmt, ##__VA_ARGS__)
 #endif
+
+
+/**
+ * String conversion macro
+ */
+#define EVAL(f, v) f(v)
+#define TO_STR_HELPER(s) #s
+#define _STR(s) EVAL(TO_STR_HELPER, s)
 
 #endif

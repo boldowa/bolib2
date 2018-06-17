@@ -167,7 +167,7 @@ static bool path_set_impl(FilePath* self, const char* const path)
 	}
 	fp->dir = calloc(len+1, sizeof(char));
 	assert(fp->dir);
-	strncpy_s(fp->dir, len+1, path, len);
+	if(len!=0) strncpy_s(fp->dir, len+1, path, len);
 
 	if(NULL == slash_pos)
 	{
