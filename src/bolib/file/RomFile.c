@@ -241,9 +241,9 @@ static /*override*/ E_FileOpen open_impl(RomFile* self)
 	raw = (uint8*)malloc((size_t)self->super.pro->size * sizeof(uint8));
 	assert(raw);
 #ifndef NDEBUG
-	rlen =  fread(raw, sizeof(uint8), (size_t)self->super.pro->size, self->super.pro->fp);
+	rlen =  fread(raw, sizeof(uint8), self->super.pro->size, self->super.pro->fp);
 #else
-	fread(raw, sizeof(uint8), (size_t)self->super.pro->size, self->super.pro->fp);
+	fread(raw, sizeof(uint8), self->super.pro->size, self->super.pro->fp);
 #endif
 	assert(self->super.pro->size == rlen);
 	self->pro->raw = raw;
@@ -330,7 +330,8 @@ static bool IsValidSum_impl(RomFile* self)
 	assert(self);
 	if(self->pro->hcsum == self->pro->csum)
 	{
-		if(self->pro->hcsum == (self->pro->hcsumc^0xffff))
+		uint16 xsum = (self->pro->hcsumc^0xffff);
+		if(self->pro->hcsum == xsum)
 		{
 			return true;
 		}
@@ -366,6 +367,7 @@ static uint32 RatsSearch_impl(RomFile* self, const uint32 sna, RatsSearcher_t se
 	uint8* ptr;
 	uint16 sz;
 	uint16 szc;
+	uint16 xsum;
 
 	assert(self);
 	if(MapMode_Unknown == self->pro->map) return ROMADDRESS_NULL;
@@ -384,7 +386,8 @@ static uint32 RatsSearch_impl(RomFile* self, const uint32 sna, RatsSearcher_t se
 			/* check valid rats tag */
 			sz =  read16(ptr+4);
 			szc = read16(ptr+6);
-			if(sz == (szc^0xffff))
+			xsum = szc^0xffff;
+			if(sz == xsum)
 			{
 				if(NULL == search || search(ptr+8, (uint32)(sz+1)))
 				{
@@ -407,6 +410,7 @@ static uint32 RatsClean_impl(RomFile* self, const uint32 sna)
 	uint8* ptr;
 	uint16 sz;
 	uint16 szc;
+	uint16 xsum;
 
 	assert(self);
 	if(MapMode_Unknown == self->pro->map) return 0;
@@ -421,7 +425,8 @@ static uint32 RatsClean_impl(RomFile* self, const uint32 sna)
 
 	sz =  read16(ptr+4);
 	szc = read16(ptr+6);
-	if(sz != (szc^0xffff)) return false;
+	xsum = szc^0xffff;
+	if(sz != xsum) return false;
 
 	/* Fill data */
 	sz = (uint16)(sz + 9);
@@ -588,7 +593,7 @@ bool IsValidSnesAddressCommon(RomFile* self, const uint32 sna)
 	uint32 bnk;
 
 	/* 24bits overflow */
-	if(0x1000000 <= sna) return ROMADDRESS_NULL;
+	if(0x1000000 <= sna) return false;
 
 	/* RAM specified check */
 	bnk = sna & 0xff0000;

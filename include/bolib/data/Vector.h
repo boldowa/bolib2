@@ -21,7 +21,7 @@ typedef struct _Vector_protected Vector_protected;
 typedef struct _Vector_private Vector_private;
 struct _Vector {
 	/* member method */
-	const void* const (*get)(Vector*, size_t);
+	const void* (*get)(Vector*, size_t);
 	bool (*set)(Vector*, size_t, const void* const);
 	size_t (*length)(Vector*);
 	size_t (*memlen)(Vector*);

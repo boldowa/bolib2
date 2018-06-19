@@ -3,7 +3,25 @@
 #-------------------------------------------------
 
 # Compile flags
-set(BOLIB2_FLAGS "-Wall -Wpedantic -Wno-format -Wconversion -Wimplicit-function-declaration")
+if(MSVC)
+	set(BOLIB2_FLAGS "")
+else(MSVC)
+	set(BOLIB2_FLAGS "")
+	# encode flags
+	if(WINDOWS)
+		add_flags(BOLIB2_FLAGS "-fexec-charset=cp932")
+	endif(WINDOWS)
+	# Warning flags
+	add_flags(BOLIB2_FLAGS "-W -Wpedantic -Wno-format -Wconversion -Wimplicit-function-declaration")
+	# Test flags
+	if(BOLIB2_EXECUTE_TEST)
+		add_flags(BOLIB2_FLAGS "-include CppUTest/MemoryLeakDetectorNewMacros.h")
+		add_flags(BOLIB2_FLAGS "-include CppUTest/MemoryLeakDetectorMallocMacros.h")
+		if(BOLIB2_COVERAGE)
+			add_flags(BOLIB2_FLAGS "--coverage")
+		endif(BOLIB2_COVERAGE)
+	endif(BOLIB2_EXECUTE_TEST)
+endif(MSVC)
 
 # Compile All sources
 file(GLOB_RECURSE PRJCSOURCES
@@ -24,17 +42,9 @@ target_include_directories(bolib2 PRIVATE
 )
 
 if(NOT MSVC)
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		if(BOLIB2_EXECUTE_TEST)
-			add_flags(BOLIB2_FLAGS "-include CppUTest/MemoryLeakDetectorNewMacros.h")
-			add_flags(BOLIB2_FLAGS "-include CppUTest/MemoryLeakDetectorMallocMacros.h")
-		endif()
-
-		if(BOLIB2_COVERAGE)
-			add_flags(BOLIB2_FLAGS "--coverage")
-			target_link_libraries(bolib2 gcov)
-			set(BOLIB2_COVERAGE_EXECUTE TRUE PARENT_SCOPE)
-		endif()
+	if(BOLIB2_COVERAGE)
+		target_link_libraries(bolib2 gcov)
+		set(BOLIB2_COVERAGE_EXECUTE TRUE PARENT_SCOPE)
 	endif()
 endif(NOT MSVC)
 set_target_properties(bolib2 PROPERTIES COMPILE_FLAGS ${BOLIB2_FLAGS})

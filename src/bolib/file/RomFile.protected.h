@@ -11,7 +11,7 @@ struct _RomFile_protected {
 	bool		hasHeader;
 	uint8*		raw;
 	uint8*		rom;
-	long		size;
+	uint		size;
 	RomType		type;
 	MapMode		map;
 	CopType		cop;

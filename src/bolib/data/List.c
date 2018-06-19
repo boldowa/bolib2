@@ -314,7 +314,7 @@ static void* index_impl(List* self, const size_t inx)
 	assert(self);
 
 	/* valid value check */
-	if(0 > inx) return NULL;
+	/*if(0 > inx) return NULL;*/
 	if(self->pro->length <= inx) return NULL;
 
 	/* list empty check */

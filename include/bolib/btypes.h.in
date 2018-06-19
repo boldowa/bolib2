@@ -37,11 +37,21 @@
 #  define pclose _pclose
 #endif
 
+/**
+ * @brief define __func__ for old Visual Studio
+ */
+#ifndef __func__
+#  ifdef __FUNCTION__
+#    define __func__ __FUNCTION__
+#  endif
+#endif
+
 #if defined(_MSC_VER)
    /* MSVC funcs */
 #  define strncasecmp _strnicmp
 #  define strcasecmp _stricmp
 #  if WINVER >= 0x0502
+#    include <stdio.h>
 #    define fopen(fn,m) _fopen_b(fn,m,__func__)
      FILE* _fopen_b(const char*, const char*, const char*);
 #  endif
@@ -52,15 +62,6 @@
  */
 #ifndef MAX_PATH
   #define MAX_PATH 260
-#endif
-
-/**
- * @brief define __func__ for old Visual Studio
- */
-#ifndef __func__
-#  ifdef __FUNCTION__
-#    define __func__ __FUNCTION__
-#  endif
 #endif
 
 

@@ -84,7 +84,7 @@ TestRomFile* new_TestRomFile_impl(const char* const str)
 			break;
 	}
 
-	self->pro->size = (long)(atoi(&str[1]) * 1024); /* Kbytes */
+	self->pro->size = (uint)(atoi(&str[1]) * 1024); /* Kbytes */
 	self->super.pro->size = self->pro->size;
 	if(0x10000 > self->size_get(self))
 	{

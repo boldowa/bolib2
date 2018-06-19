@@ -18,7 +18,7 @@ char* gettmpdir(void);
 
 char* abspath(const char* const);
 
-long fsize(const char* const);
+uint fsize(const char* const);
 
 bool makedir(const char* const);
 

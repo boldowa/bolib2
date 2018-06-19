@@ -12,7 +12,7 @@
 
 /* prototypes */
 static bool default_cloner_impl(void*, const void* const, size_t);
-static const void* const get_impl(Vector*, size_t);
+static const void* get_impl(Vector*, size_t);
 static bool set_impl(Vector*, size_t, const void* const);
 static size_t length_impl(Vector*);
 static size_t memlen_impl(Vector*);
@@ -210,7 +210,7 @@ static bool default_cloner_impl(void* dest, const void* const src, size_t len)
  *
  * @return NULL: nothing / NOT NULL: data address
  */
-static const void* const get_impl(Vector* self, size_t ofs)
+static const void* get_impl(Vector* self, size_t ofs)
 {
 	assert(self);
 	if(self->pro->length <= ofs) return NULL;
@@ -322,7 +322,7 @@ static bool insert_impl(Vector* self, const size_t ofs, const void* const data, 
 	uint8* ptr;
 
 	assert(self);
-	assert(len>=0);
+	/*assert(len>=0);*/
 
 	base = self->pro->length;
 	if(ofs>base) base = ofs;

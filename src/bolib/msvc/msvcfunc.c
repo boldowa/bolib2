@@ -2,8 +2,15 @@
  * @file msvcfunc.c
  *   this source will compile only visual studio.
  */
+
+/**
+ * Dummy (for ISO C compatible)
+ */
+typedef int DummyTypeForISOCompatible;
+
 #if defined(_MSC_VER)
 
+#include "bolib/btypes.h"
 #include <stdio.h>
 #include <errno.h>
 

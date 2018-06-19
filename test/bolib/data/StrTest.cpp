@@ -133,6 +133,22 @@ TEST(Str, Str_replace)
 	free(z);
 }
 
+/**
+ * Check Str_replace
+ */
+TEST(Str, Str_replace2)
+{
+	const char* S = "!!a!!bxx!!z";
+	/* Invalid value check */
+	char* v;
+	v = Str_replace("!!", "!!!!", S);
+	STRCMP_EQUAL("!!!!a!!!!bxx!!!!z", v);
+	free(v);
+	v = Str_replace("!!", "!", S);
+	STRCMP_EQUAL("!a!bxx!z", v);
+	free(v);
+}
+
 
 /*--- (!)CAUTION(!) Don't edit this comment! ---*/
 

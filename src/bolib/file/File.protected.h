@@ -18,7 +18,7 @@ struct _File_protected {
 	/* File mode */
 	char* mode;
 	/* File size */
-	long size;
+	uint size;
 
 	/* vertual function pointer */
 	E_FileOpen (*open_vertual)(File*);

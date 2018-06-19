@@ -146,7 +146,7 @@ char* abspath(const char* const path)
  *
  * @return file size
  */
-long fsize(const char* const path)
+uint fsize(const char* const path)
 {
 #if isWindows
 	HANDLE hFile;
@@ -161,12 +161,12 @@ long fsize(const char* const path)
 
 	dwSize = GetFileSize(hFile, NULL);
 	CloseHandle(hFile);
-	return (long)dwSize;
+	return (uint)dwSize;
 #else
 	struct stat st;
 	if(0 == stat(path, &st) && S_ISREG(st.st_mode))
 	{
-		return st.st_size;
+		return (uint)st.st_size;
 	}
 	return 0;
 #endif
