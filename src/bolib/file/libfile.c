@@ -199,6 +199,9 @@ char* getworkdir(const char* const basename)
 	char* workdir = NULL;
 
 	tmpdir = gettmpdir();
+#if isWindows
+	if(!dexists(tmpdir)) makedir(tmpdir);
+#endif
 	workdir = Str_concat(tmpdir, basename);
 	free(tmpdir);
 
