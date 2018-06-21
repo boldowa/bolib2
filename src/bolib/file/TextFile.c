@@ -68,7 +68,7 @@ TextFile* new_TextFile_impl(const char* const path)
 	self->name_get = (const char*(*)(TextFile*))self->super.name_get;
 	self->ext_get = (const char*(*)(TextFile*))self->super.ext_get;
 	self->close = (void(*)(TextFile*))self->super.close;
-	self->size_get = (long(*)(TextFile*))self->super.size_get;
+	self->size_get = (uint(*)(TextFile*))self->super.size_get;
 
 	/* init TextFile object */
 	self->pro = pro;
@@ -121,7 +121,7 @@ static void overrider_impl(TextFile* self)
 	self->super.ext_get	= (const char*(*)(File*))self->ext_get;
 	self->super.open	= (E_FileOpen (*)(File*))self->open;
 	self->super.close	= (void(*)(File*))self->close;
-	self->super.size_get	= (long(*)(File*))self->size_get;
+	self->super.size_get	= (uint(*)(File*))self->size_get;
 }
 
 static uint row_get_impl(TextFile* self)

@@ -75,7 +75,7 @@ MmlFile* new_MmlFile_impl(const char* const path)
 	self->name_get = (const char*(*)(MmlFile*))self->super.name_get;
 	self->ext_get = (const char*(*)(MmlFile*))self->super.ext_get;
 	self->close = (void(*)(MmlFile*))self->super.close;
-	self->size_get = (long(*)(MmlFile*))self->super.size_get;
+	self->size_get = (uint(*)(MmlFile*))self->super.size_get;
 
 	/* init MmlFile object */
 	self->pro = pro;
@@ -136,7 +136,7 @@ static void overrider_impl(MmlFile* self)
 	self->super.ext_get	= (const char*(*)(TextFile*))self->ext_get;
 	self->super.open	= (E_FileOpen (*)(TextFile*))self->open;
 	self->super.close	= (void(*)(TextFile*))self->close;
-	self->super.size_get	= (long(*)(TextFile*))self->size_get;
+	self->super.size_get	= (uint(*)(TextFile*))self->size_get;
 
 	self->super.pro->overrider(&self->super);
 }

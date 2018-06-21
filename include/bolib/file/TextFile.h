@@ -32,7 +32,7 @@ struct _TextFile {
 	const char* (*name_get)(TextFile*);
 	const char* (*ext_get)(TextFile*);
 	void (*close)(TextFile*);
-	long (*size_get)(TextFile*);
+	uint (*size_get)(TextFile*);
 	/* protected members */
 	TextFile_protected* pro;
 };

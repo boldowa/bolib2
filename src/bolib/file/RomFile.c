@@ -34,7 +34,7 @@ typedef struct _RomDetectScore {
 static void overrider_impl(RomFile* self);
 static /*override*/ E_FileOpen open_impl(RomFile* self);
 static /*override*/ void close_impl(RomFile* self);
-static /*override*/ long size_get_impl(RomFile* self);
+static /*override*/ uint size_get_impl(RomFile* self);
 static RomType type_get_impl(RomFile* self);
 static MapMode mapmode_get_impl(RomFile* self);
 static uint16 sum_get_impl(RomFile* self);
@@ -174,10 +174,10 @@ void delete_RomFile_impl(RomFile** self)
 
 /*--------------- internal methods ---------------*/
 
-static uint16 byteSum(const uint8 *data, long len)
+static uint16 byteSum(const uint8 *data, uint len)
 {
 	uint16 sum = 0;
-	long i;
+	uint i;
 
 	for(i=0; i<len; i++)
 	{
@@ -188,7 +188,7 @@ static uint16 byteSum(const uint8 *data, long len)
 }
 static void CalcSum(RomFile* self)
 {
-	long mask = 0x1000000;
+	uint mask = 0x1000000;
 	uint32 sumadr;
 
 	assert(self);
@@ -219,7 +219,7 @@ static void overrider_impl(RomFile* self)
 	self->super.ext_get	= (const char*(*)(File*))self->ext_get;
 	self->super.open	= (E_FileOpen (*)(File*))self->open;
 	self->super.close	= (void(*)(File*))self->close;
-	self->super.size_get	= (long(*)(File*))self->size_get;
+	self->super.size_get	= (uint(*)(File*))self->size_get;
 }
 
 static /*override*/ E_FileOpen open_impl(RomFile* self)
@@ -269,7 +269,7 @@ static /*override*/ void close_impl(RomFile* self)
 }
 
 
-static /*override*/ long size_get_impl(RomFile* self)
+static /*override*/ uint size_get_impl(RomFile* self)
 {
 	assert(self);
 	return self->pro->size;

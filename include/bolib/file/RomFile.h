@@ -110,7 +110,7 @@ struct _RomFile {
 	const char* (*ext_get)(RomFile*);
 	E_FileOpen (*open)(RomFile*);
 	void (*close)(RomFile*);
-	long (*size_get)(RomFile*);
+	uint (*size_get)(RomFile*);
 	/* protected members */
 	RomFile_protected* pro;
 };

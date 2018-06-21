@@ -16,7 +16,7 @@
 /* prototypes */
 static void close_impl(File*);
 static E_FileOpen open_impl(File*);
-static long size_get_impl(File*);
+static uint size_get_impl(File*);
 static const char* path_get_impl(File*);
 static const char* dir_get_impl(File*);
 static const char* name_get_impl(File*);
@@ -113,7 +113,7 @@ void delete_File_impl(File** self)
  *
  * @return size of file
  */
-static long size_get_impl(File* self)
+static uint size_get_impl(File* self)
 {
 	assert(self);
 	return self->pro->size;

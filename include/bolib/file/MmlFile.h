@@ -33,7 +33,7 @@ struct _MmlFile {
 	const char* (*name_get)(MmlFile*);
 	const char* (*ext_get)(MmlFile*);
 	void (*close)(MmlFile*);
-	long (*size_get)(MmlFile*);
+	uint (*size_get)(MmlFile*);
 	/* protected members */
 	MmlFile_protected* pro;
 	/* private members */

@@ -14,9 +14,11 @@ else(MSVC)
 	# Warning flags
 	add_flags(BOLIB2_FLAGS "-W -Wpedantic -Wno-format -Wconversion -Wimplicit-function-declaration")
 	# Test flags
-	if(BOLIB2_EXECUTE_TEST)
+	if(BOLIB2_TESTBUILD)
 		add_flags(BOLIB2_FLAGS "-include CppUTest/MemoryLeakDetectorNewMacros.h")
 		add_flags(BOLIB2_FLAGS "-include CppUTest/MemoryLeakDetectorMallocMacros.h")
+	endif(BOLIB2_TESTBUILD)
+	if(BOLIB2_EXECUTE_TEST)
 		if(BOLIB2_COVERAGE)
 			add_flags(BOLIB2_FLAGS "--coverage")
 		endif(BOLIB2_COVERAGE)

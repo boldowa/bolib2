@@ -34,7 +34,7 @@ struct _File {
 	const char* (*ext_get)(File*);
 	E_FileOpen (*open)(File*);
 	void (*close)(File*);
-	long (*size_get)(File*);
+	uint (*size_get)(File*);
 
 	/* protected members */
 	File_protected* pro;
